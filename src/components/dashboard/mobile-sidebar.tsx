@@ -4,14 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { dashboardNav } from "@/components/dashboard/nav";
-import { cn } from "@/lib/utils";
+import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 
-/**
- * Mobile-only sidebar drawer. The trigger button shows on small screens; the
- * desktop sidebar (in the layout) takes over from lg+.
- */
-export function MobileSidebar() {
+export function MobileSidebar({ learnerName }: { learnerName?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -46,24 +41,17 @@ export function MobileSidebar() {
               </button>
             </div>
 
-            <nav className="mt-8 flex flex-1 flex-col gap-1">
-              {dashboardNav.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
-                    item.active
-                      ? "bg-brand-50 text-brand-700"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-navy",
-                  )}
-                >
-                  <item.icon className="size-5" aria-hidden="true" />
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            {learnerName ? (
+              <p className="mt-4 text-sm font-semibold text-slate-500">
+                {learnerName}
+              </p>
+            ) : null}
+
+            <SidebarNav
+              variant="mobile"
+              className="mt-6 flex-1"
+              onItemClick={() => setOpen(false)}
+            />
 
             <Link
               href="/"

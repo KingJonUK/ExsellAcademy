@@ -8,7 +8,13 @@ export const metadata: Metadata = {
     "Log in to your ExSell Academy account to continue your sales training and track your progress.",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string; error?: string }>;
+}) {
+  const { next, error } = await searchParams;
+
   return (
     <div>
       <h1 className="font-display text-3xl font-extrabold text-navy">
@@ -19,7 +25,7 @@ export default function LoginPage() {
       </p>
 
       <div className="mt-8">
-        <LoginForm />
+        <LoginForm next={next} error={error === "1"} />
       </div>
 
       <p className="mt-8 text-center text-sm text-slate-600">

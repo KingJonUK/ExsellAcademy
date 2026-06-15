@@ -1,22 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Label } from "@/components/ui/form";
+import { learnerLoginAction } from "@/app/(auth)/auth-actions";
 
-export function LoginForm() {
+export function LoginForm({
+  next,
+  error,
+}: {
+  next?: string;
+  error?: boolean;
+}) {
   const [showPassword, setShowPassword] = useState(false);
-  const [notice, setNotice] = useState(false);
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setNotice(true);
-  }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5">
+    <form action={learnerLoginAction} noValidate className="space-y-5">
+      <input type="hidden" name="next" value={next ?? ""} />
+
+      {error ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm font-medium text-red-800"
+        >
+          Incorrect password — use the demo credentials below.
+        </p>
+      ) : null}
+
       <Field label="Email address" htmlFor="email">
         <div className="relative">
           <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
@@ -36,12 +47,6 @@ export function LoginForm() {
           <Label htmlFor="password" className="mb-0">
             Password
           </Label>
-          <Link
-            href="#"
-            className="text-xs font-semibold text-brand-700 hover:text-brand-800"
-          >
-            Forgot password?
-          </Link>
         </div>
         <div className="relative">
           <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
@@ -68,46 +73,17 @@ export function LoginForm() {
         </div>
       </div>
 
-      <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
-        <input
-          type="checkbox"
-          name="remember"
-          className="size-4 rounded border-slate-300 text-brand-600 focus:ring-2 focus:ring-brand-500/30"
-        />
-        Remember me
-      </label>
-
       <Button type="submit" size="lg" className="w-full">
         Log in
       </Button>
 
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm font-medium text-amber-800"
-        >
-          Authentication isn&apos;t connected in this preview yet.
+      {/* Demo credentials */}
+      <div className="rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm">
+        <p className="font-semibold text-brand-800">Demo access</p>
+        <p className="mt-0.5 text-brand-700">
+          Any email · Password:{" "}
+          <span className="font-mono font-bold">exsell-learner</span>
         </p>
-      ) : null}
-
-      <div className="relative py-1">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-slate-200" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-white px-3 text-xs font-medium uppercase tracking-wide text-slate-400">
-            or
-          </span>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <Button type="submit" variant="outline" size="lg" className="w-full">
-          Continue with Google
-        </Button>
-        <Button type="submit" variant="outline" size="lg" className="w-full">
-          Continue with LinkedIn
-        </Button>
       </div>
     </form>
   );
