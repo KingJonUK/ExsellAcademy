@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { Eyebrow } from "@/components/ui/section";
-import { Card } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { Icon } from "@/components/icon";
 import { ApplicationForm } from "@/components/forms/application-form";
 import { fundedIncludes } from "@/lib/data/content";
@@ -36,29 +36,49 @@ const afterYouApply = [
 export default function ApplyPage() {
   return (
     <>
-      {/* Page header */}
-      <section className="border-b border-slate-200 bg-slate-50">
-        <div className="container-page py-12 sm:py-16">
-          <div className="max-w-2xl">
-            <Eyebrow>ExSell Foundation</Eyebrow>
-            <h1 className="text-3xl font-bold text-navy sm:text-4xl">
-              Apply for a funded place
+      {/* Premium page header */}
+      <section className="relative overflow-hidden border-b border-slate-200 bg-aurora">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-50" />
+        <div className="container-page py-16 sm:py-24">
+          <div className="max-w-3xl">
+            <span
+              className="inline-flex animate-fade-up items-center gap-2 rounded-full border border-brand-100 bg-white/70 px-4 py-1.5 text-sm font-semibold text-brand-700 shadow-soft backdrop-blur"
+              style={{ animationDelay: "40ms" }}
+            >
+              <Sparkles className="size-4 text-violet-500" />
+              ExSell Foundation · fully funded places
+            </span>
+            <h1
+              className="mt-6 animate-fade-up text-hero text-navy"
+              style={{ animationDelay: "120ms" }}
+            >
+              Apply for a{" "}
+              <span className="text-gradient">funded place</span>
             </h1>
-            <p className="mt-4 text-lg leading-relaxed text-slate-600">
+            <p
+              className="mt-5 max-w-2xl animate-fade-up text-lg leading-relaxed text-slate-600"
+              style={{ animationDelay: "200ms" }}
+            >
               It takes just a few minutes. Share a little about yourself and your
               goals, and our team will take it from there.
+            </p>
+            <p
+              className="mt-6 animate-fade-up text-sm text-slate-500"
+              style={{ animationDelay: "280ms" }}
+            >
+              No cost · No experience needed · Open to all backgrounds
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 lg:py-24">
+      <section className="bg-slate-50 py-16 sm:py-20 lg:py-24">
         <div className="container-page">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             {/* Supportive copy */}
             <div className="lg:sticky lg:top-24 lg:self-start">
               <Eyebrow>What happens next</Eyebrow>
-              <h2 className="text-2xl font-bold text-navy sm:text-3xl">
+              <h2 className="text-display text-navy">
                 A supported journey from day one
               </h2>
               <p className="mt-4 leading-relaxed text-slate-600">
@@ -70,9 +90,9 @@ export default function ApplyPage() {
               <ol className="mt-8 space-y-6">
                 {afterYouApply.map((item, i) => (
                   <li key={item.title} className="flex gap-4">
-                    <span className="relative grid size-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                    <span className="relative grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow">
                       <Icon name={item.icon} className="size-5" />
-                      <span className="absolute -right-2 -top-2 grid size-5 place-items-center rounded-full bg-brand-600 text-[10px] font-bold text-white">
+                      <span className="absolute -right-2 -top-2 grid size-5 place-items-center rounded-full bg-white text-[10px] font-bold text-brand-700 shadow-soft ring-1 ring-slate-200">
                         {i + 1}
                       </span>
                     </span>
@@ -86,7 +106,7 @@ export default function ApplyPage() {
                 ))}
               </ol>
 
-              <div className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <GlassCard className="mt-10 p-6">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-600">
                   What&apos;s included
                 </h3>
@@ -102,13 +122,13 @@ export default function ApplyPage() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </GlassCard>
             </div>
 
             {/* Form */}
-            <Card className="p-6 sm:p-8 lg:p-10">
+            <GlassCard className="p-6 shadow-elevated sm:p-8 lg:p-10">
               <ApplicationForm />
-            </Card>
+            </GlassCard>
           </div>
         </div>
       </section>

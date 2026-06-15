@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Check, HeartHandshake, Sparkles, Star, TrendingUp } from "lucide-react";
 import { Section, SectionHeading, Eyebrow } from "@/components/ui/section";
 import { Reveal } from "@/components/reveal";
 import { Icon } from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
-import { StatCard } from "@/components/stat-card";
+import { GlassCard } from "@/components/ui/glass-card";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { sponsorPackages, caseStudies } from "@/lib/data/content";
@@ -38,11 +39,16 @@ const missionPoints: { icon: string; title: string; description: string }[] = [
 ];
 
 // Illustrative placeholder metrics for the sample dashboard preview.
-const dashboardMetrics: { value: string; label: string; note?: string }[] = [
-  { value: "24", label: "Learners funded", note: "Across your sponsorship" },
-  { value: "92%", label: "Completion rate", note: "Of enrolled learners" },
-  { value: "21", label: "Certificates earned", note: "CPD-recognised" },
-  { value: "15", label: "Placements achieved", note: "Into sales roles" },
+const dashboardMetrics: {
+  value: number;
+  suffix?: string;
+  label: string;
+  note?: string;
+}[] = [
+  { value: 24, label: "Learners funded", note: "Across your sponsorship" },
+  { value: 92, suffix: "%", label: "Completion rate", note: "Of enrolled learners" },
+  { value: 21, label: "Certificates earned", note: "CPD-recognised" },
+  { value: 15, label: "Placements achieved", note: "Into sales roles" },
 ];
 
 const dashboardProgress: { label: string; value: number }[] = [
@@ -76,25 +82,40 @@ export default function SponsorsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-200 bg-slate-50 bg-grid">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-24 -top-24 size-96 rounded-full bg-brand-200/40 blur-3xl" />
-          <div className="absolute -right-16 top-32 size-96 rounded-full bg-accent-200/40 blur-3xl" />
-        </div>
-        <div className="container-page py-16 sm:py-20 lg:py-24">
-          <div className="max-w-3xl">
-            <Eyebrow>For sponsors</Eyebrow>
-            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-navy sm:text-5xl lg:text-6xl">
+      <section className="relative overflow-hidden bg-aurora">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-50" />
+        <div className="container-page grid items-center gap-12 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
+          <div>
+            <span
+              className="inline-flex animate-fade-up items-center gap-2 rounded-full border border-accent-100 bg-white/70 px-4 py-1.5 text-sm font-semibold text-accent-700 shadow-soft backdrop-blur"
+              style={{ animationDelay: "40ms" }}
+            >
+              <HeartHandshake className="size-4 text-accent-500" />
+              For sponsors
+            </span>
+
+            <h1
+              className="mt-6 animate-fade-up text-hero text-navy"
+              style={{ animationDelay: "120ms" }}
+            >
               Fund a learner.{" "}
               <span className="text-gradient">Change a career path.</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-600">
+
+            <p
+              className="mt-5 max-w-xl animate-fade-up text-lg leading-relaxed text-slate-600"
+              style={{ animationDelay: "240ms" }}
+            >
               Your sponsorship gives a motivated learner the training,
               certification and employer connections they need to start a sales
               career — and helps build the future sales workforce. Every place
               you fund is an opportunity you create.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+
+            <div
+              className="mt-8 flex animate-fade-up flex-col gap-3 sm:flex-row sm:flex-wrap"
+              style={{ animationDelay: "300ms" }}
+            >
               <Link
                 href="/contact"
                 className={buttonVariants({ variant: "primary", size: "lg" })}
@@ -109,7 +130,16 @@ export default function SponsorsPage() {
                 Talk to our team
               </Link>
             </div>
+
+            <p
+              className="mt-6 animate-fade-up text-sm text-slate-500"
+              style={{ animationDelay: "360ms" }}
+            >
+              Measurable social impact · Live outcome reporting · CSR-ready
+            </p>
           </div>
+
+          <SponsorHeroVisual />
         </div>
       </section>
 
@@ -118,7 +148,7 @@ export default function SponsorsPage() {
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <Eyebrow>Our mission</Eyebrow>
-            <h2 className="text-3xl font-bold text-navy sm:text-4xl">
+            <h2 className="text-display text-navy">
               Turning potential into opportunity
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-slate-600">
@@ -133,8 +163,8 @@ export default function SponsorsPage() {
           <div className="grid gap-4">
             {missionPoints.map((point, i) => (
               <Reveal key={point.title} delay={i * 0.06}>
-                <div className="flex h-full gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
-                  <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-100 text-accent-700">
+                <GlassCard className="flex h-full gap-4 p-6">
+                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow">
                     <Icon name={point.icon} className="size-6" />
                   </span>
                   <div>
@@ -145,7 +175,7 @@ export default function SponsorsPage() {
                       {point.description}
                     </p>
                   </div>
-                </div>
+                </GlassCard>
               </Reveal>
             ))}
           </div>
@@ -164,10 +194,10 @@ export default function SponsorsPage() {
             <Reveal key={pkg.name} delay={i * 0.08}>
               <div
                 className={cn(
-                  "relative flex h-full flex-col rounded-2xl border bg-white p-7 shadow-soft",
+                  "relative flex h-full flex-col rounded-3xl p-7 shadow-md",
                   pkg.highlighted
-                    ? "border-brand-200 ring-2 ring-brand-500 md:scale-[1.03]"
-                    : "border-slate-200",
+                    ? "gradient-border bg-white ring-1 ring-brand-500/20 md:scale-[1.03]"
+                    : "border border-slate-200 bg-white shadow-soft",
                 )}
               >
                 {pkg.highlighted ? (
@@ -220,15 +250,15 @@ export default function SponsorsPage() {
       </Section>
 
       {/* Impact dashboard preview */}
-      <section className="relative overflow-hidden bg-navy py-20 text-white sm:py-24">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -right-10 -top-10 size-72 rounded-full bg-brand-500/25 blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 size-72 rounded-full bg-accent-500/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-midnight py-20 text-white sm:py-24">
+        <div className="pointer-events-none absolute inset-0 -z-0 opacity-70">
+          <div className="absolute -right-10 -top-10 size-96 rounded-full bg-brand-600/30 blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 size-80 rounded-full bg-violet-600/25 blur-3xl" />
         </div>
-        <div className="container-page">
+        <div className="container-page relative">
           <div className="mx-auto max-w-2xl text-center">
-            <Eyebrow className="text-accent-300">See your impact</Eyebrow>
-            <h2 className="text-3xl font-bold sm:text-4xl">
+            <Eyebrow tone="light">See your impact</Eyebrow>
+            <h2 className="text-display">
               A dashboard that shows your difference
             </h2>
             <p className="mt-4 text-slate-300">
@@ -239,7 +269,7 @@ export default function SponsorsPage() {
           </div>
 
           <Reveal delay={0.1}>
-            <div className="mx-auto mt-12 max-w-5xl rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur sm:p-8">
+            <div className="mx-auto mt-12 max-w-5xl rounded-[2rem] glass-dark p-6 shadow-elevated sm:p-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2 font-semibold">
                   <Sparkles className="size-5 text-accent-300" />
@@ -250,11 +280,29 @@ export default function SponsorsPage() {
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {dashboardMetrics.map((metric) => (
-                  <StatCard key={metric.label} {...metric} />
+                  <div
+                    key={metric.label}
+                    className="rounded-3xl glass-dark p-6 text-center"
+                  >
+                    <div className="font-display text-4xl font-extrabold text-white">
+                      <AnimatedCounter
+                        value={metric.value}
+                        suffix={metric.suffix ?? ""}
+                      />
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-accent-300">
+                      {metric.label}
+                    </div>
+                    {metric.note ? (
+                      <div className="mt-2 text-xs text-slate-400">
+                        {metric.note}
+                      </div>
+                    ) : null}
+                  </div>
                 ))}
               </div>
 
-              <div className="mt-6 grid gap-6 rounded-2xl border border-white/10 bg-white/5 p-6 sm:grid-cols-3">
+              <div className="mt-6 grid gap-6 rounded-2xl glass-dark p-6 sm:grid-cols-3">
                 {dashboardProgress.map((item) => (
                   <div key={item.label}>
                     <div className="mb-2 flex items-center justify-between text-sm">
@@ -286,11 +334,11 @@ export default function SponsorsPage() {
           title="Funding you can measure"
           description="Sponsorship shouldn't be a leap of faith. We track outcomes end to end and report back, so you always know the difference you're making."
         />
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
           {reportingFeatures.map((feature, i) => (
-            <Reveal key={feature.title} delay={i * 0.06}>
-              <div className="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-soft">
-                <span className="grid size-12 place-items-center rounded-xl bg-brand-600 text-white">
+            <Reveal key={feature.title} delay={i * 0.08}>
+              <GlassCard className="h-full p-8">
+                <span className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow">
                   <Icon name={feature.icon} className="size-6" />
                 </span>
                 <h3 className="mt-5 text-lg font-bold text-navy">
@@ -299,42 +347,43 @@ export default function SponsorsPage() {
                 <p className="mt-2 leading-relaxed text-slate-600">
                   {feature.description}
                 </p>
-              </div>
+              </GlassCard>
             </Reveal>
           ))}
         </div>
 
         {/* Case studies (sponsor + relevant outcomes) */}
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
           {caseStudies
             .filter((study) => study.audience !== "Employer")
-            .map((study) => (
-              <div
-                key={study.title}
-                className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50 p-7"
-              >
-                <Badge tone="accent">{study.audience}</Badge>
-                <h3 className="mt-4 text-lg font-bold text-navy">
-                  {study.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  {study.body}
-                </p>
-              </div>
+            .map((study, i) => (
+              <Reveal key={study.title} delay={i * 0.08}>
+                <GlassCard className="flex h-full flex-col p-7">
+                  <Badge tone="accent">{study.audience}</Badge>
+                  <h3 className="mt-4 text-lg font-bold text-navy">
+                    {study.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    {study.body}
+                  </p>
+                </GlassCard>
+              </Reveal>
             ))}
         </div>
       </Section>
 
       {/* Final CTA */}
-      <section className="border-t border-slate-200 bg-white py-20">
+      <section className="bg-white py-20">
         <div className="container-page">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 to-brand-900 px-6 py-16 text-center text-white shadow-glow sm:px-12">
-            <div className="pointer-events-none absolute -right-10 -top-10 size-64 rounded-full bg-brand-500/30 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-10 -left-10 size-64 rounded-full bg-accent-500/20 blur-3xl" />
-            <h2 className="relative text-3xl font-bold sm:text-4xl">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-midnight px-6 py-20 text-center text-white shadow-elevated sm:px-12">
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute -right-10 -top-10 size-72 rounded-full bg-brand-500/30 blur-3xl" />
+              <div className="absolute -bottom-10 -left-10 size-72 rounded-full bg-accent-500/20 blur-3xl" />
+            </div>
+            <h2 className="relative text-display">
               Back the next generation of sales talent
             </h2>
-            <p className="relative mx-auto mt-4 max-w-xl text-brand-100">
+            <p className="relative mx-auto mt-4 max-w-xl text-slate-300">
               Fund a learner today and turn your support into measurable social
               impact — with the reporting to prove it.
             </p>
@@ -357,5 +406,76 @@ export default function SponsorsPage() {
         </div>
       </section>
     </>
+  );
+}
+
+function SponsorHeroVisual() {
+  return (
+    <div
+      className="relative mx-auto hidden h-[460px] w-full max-w-md animate-fade-in lg:block"
+      style={{ animationDelay: "200ms" }}
+    >
+      {/* main glass panel — sponsorship impact */}
+      <div className="absolute inset-x-0 top-8 rounded-3xl glass-card p-6 shadow-elevated">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-slate-500">Your impact</p>
+            <p className="font-display text-2xl font-extrabold text-navy">
+              Learners funded
+            </p>
+            <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-accent-600">
+              <TrendingUp className="size-3.5" /> Outcomes tracked live
+            </span>
+          </div>
+          <span className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow">
+            <HeartHandshake className="size-6" />
+          </span>
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          {[
+            { value: 24, label: "Funded" },
+            { value: 21, label: "Certified" },
+            { value: 15, label: "Placed" },
+            { value: 92, suffix: "%", label: "Completion" },
+          ].map((s) => (
+            <div key={s.label} className="rounded-2xl bg-slate-50 p-4 text-center">
+              <div className="font-display text-2xl font-extrabold text-navy">
+                <AnimatedCounter value={s.value} suffix={s.suffix ?? ""} />
+              </div>
+              <div className="mt-0.5 text-xs font-semibold text-slate-500">
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-center text-[11px] text-slate-400">
+          Illustrative sample figures
+        </p>
+      </div>
+
+      {/* floating CSR card */}
+      <div className="absolute -left-6 bottom-3 w-56 animate-float rounded-2xl glass-card p-4 shadow-md">
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 place-items-center rounded-xl bg-accent-100 text-accent-700">
+            <Icon name="FileText" className="size-5" />
+          </span>
+          <div>
+            <p className="text-xs font-semibold text-navy">Quarterly report</p>
+            <p className="text-xs text-slate-500">Board-ready impact</p>
+          </div>
+        </div>
+      </div>
+
+      {/* floating sponsor card */}
+      <div className="absolute -right-4 top-0 flex w-44 animate-float-slow items-center gap-2 rounded-2xl glass-card p-3 shadow-md">
+        <span className="grid size-9 place-items-center rounded-lg bg-brand-50 text-brand-600">
+          <Sparkles className="size-5" />
+        </span>
+        <div>
+          <p className="text-xs font-semibold text-navy">CSR impact</p>
+          <p className="text-[11px] text-slate-500">Measurable & proven</p>
+        </div>
+      </div>
+    </div>
   );
 }

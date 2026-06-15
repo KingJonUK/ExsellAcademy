@@ -1,4 +1,10 @@
-import type { ComponentProps, ReactNode } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import { cn } from "@/lib/utils";
 
 const controlBase =
@@ -70,17 +76,38 @@ export function Field({
   className?: string;
   children: ReactNode;
 }) {
+  // Associate the error/hint message with the control for screen readers.
+  const describedBy = htmlFor
+    ? error
+      ? `${htmlFor}-error`
+      : hint
+        ? `${htmlFor}-hint`
+        : undefined
+    : undefined;
+
+  const control =
+    describedBy && isValidElement(children)
+      ? cloneElement(children as ReactElement<Record<string, unknown>>, {
+          "aria-describedby": describedBy,
+          "aria-invalid": error ? true : undefined,
+        })
+      : children;
+
   return (
     <div className={className}>
       <Label htmlFor={htmlFor}>
         {label}
         {required ? <span className="ml-0.5 text-red-500">*</span> : null}
       </Label>
-      {children}
+      {control}
       {error ? (
-        <p className="mt-1.5 text-xs font-medium text-red-600">{error}</p>
+        <p id={`${htmlFor}-error`} className="mt-1.5 text-xs font-medium text-red-600">
+          {error}
+        </p>
       ) : hint ? (
-        <p className="mt-1.5 text-xs text-slate-500">{hint}</p>
+        <p id={`${htmlFor}-hint`} className="mt-1.5 text-xs text-slate-500">
+          {hint}
+        </p>
       ) : null}
     </div>
   );

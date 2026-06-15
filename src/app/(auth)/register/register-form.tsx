@@ -86,11 +86,17 @@ export function RegisterForm() {
         />
         <span>
           I agree to the{" "}
-          <a href="#" className="font-semibold text-brand-700 hover:text-brand-800">
+          <a
+            href="/terms"
+            className="font-semibold text-brand-700 hover:text-brand-800"
+          >
             Terms of Service
           </a>{" "}
           and{" "}
-          <a href="#" className="font-semibold text-brand-700 hover:text-brand-800">
+          <a
+            href="/privacy"
+            className="font-semibold text-brand-700 hover:text-brand-800"
+          >
             Privacy Policy
           </a>
           .

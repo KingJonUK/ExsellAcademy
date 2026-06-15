@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Target, Rocket, Building2 } from "lucide-react";
+import { Target, Rocket, Building2, Sparkles } from "lucide-react";
 import { Section, SectionHeading, Eyebrow } from "@/components/ui/section";
 import { Reveal } from "@/components/reveal";
 import { Icon } from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
+import { GlassCard } from "@/components/ui/glass-card";
 import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/lib/site";
 import { caseStudies } from "@/lib/data/content";
@@ -66,14 +67,27 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-200 bg-slate-50 bg-grid">
-        <div className="container-page py-16 sm:py-20 lg:py-24">
+      <section className="relative overflow-hidden bg-aurora">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-50" />
+        <div className="container-page py-20 lg:py-28">
           <div className="max-w-3xl">
-            <Eyebrow>About ExSell Academy</Eyebrow>
-            <h1 className="text-4xl font-bold tracking-tight text-navy sm:text-5xl">
+            <span
+              className="inline-flex animate-fade-up items-center gap-2 rounded-full border border-brand-100 bg-white/70 px-4 py-1.5 text-sm font-semibold text-brand-700 shadow-soft backdrop-blur"
+              style={{ animationDelay: "40ms" }}
+            >
+              <Sparkles className="size-4 text-violet-500" />
+              About ExSell Academy
+            </span>
+            <h1
+              className="mt-6 animate-fade-up text-hero text-navy"
+              style={{ animationDelay: "120ms" }}
+            >
               {siteConfig.tagline}
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-slate-600">
+            <p
+              className="mt-5 max-w-2xl animate-fade-up text-lg leading-relaxed text-slate-600"
+              style={{ animationDelay: "240ms" }}
+            >
               {siteConfig.supportingLine} {siteConfig.description}
             </p>
           </div>
@@ -119,14 +133,14 @@ export default function AboutPage() {
           title="One ecosystem, three connected engines"
           description="Learning, funding and recruitment work as a single pathway — each part feeding the next."
         />
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
           {engines.map((engine, i) => (
             <Reveal key={engine.name} delay={i * 0.08}>
-              <div className="relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 shadow-soft">
-                <span className="absolute right-5 top-4 font-display text-6xl font-extrabold text-slate-100">
+              <GlassCard className="relative h-full overflow-hidden p-8">
+                <span className="absolute right-5 top-3 font-display text-7xl font-extrabold text-slate-900/[0.04]">
                   {i + 1}
                 </span>
-                <span className="relative grid size-12 place-items-center rounded-xl bg-brand-600 text-white">
+                <span className="relative grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow">
                   <Icon name={engine.icon} className="size-6" />
                 </span>
                 <h3 className="mt-5 text-xl font-bold text-navy">
@@ -135,7 +149,7 @@ export default function AboutPage() {
                 <p className="mt-2 leading-relaxed text-slate-600">
                   {engine.description}
                 </p>
-              </div>
+              </GlassCard>
             </Reveal>
           ))}
         </div>
@@ -147,10 +161,10 @@ export default function AboutPage() {
           eyebrow="What we value"
           title="The principles behind everything we build"
         />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {values.map((value, i) => (
-            <Reveal key={value.title} delay={i * 0.05}>
-              <div className="h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <Reveal key={value.title} delay={i * 0.06}>
+              <GlassCard className="h-full p-6">
                 <span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-600">
                   <Icon name={value.icon} className="size-5" />
                 </span>
@@ -158,7 +172,7 @@ export default function AboutPage() {
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
                   {value.description}
                 </p>
-              </div>
+              </GlassCard>
             </Reveal>
           ))}
         </div>
@@ -171,40 +185,39 @@ export default function AboutPage() {
           title="What success looks like"
           description="Real testimonials will appear here as our community grows. Until then, here's how the ecosystem works for learners, employers and sponsors."
         />
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {caseStudies.map((study) => (
-            <div
-              key={study.title}
-              className="flex flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-soft"
-            >
-              <Badge tone="brand">{study.audience}</Badge>
-              <h3 className="mt-4 text-lg font-bold text-navy">
-                {study.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                {study.body}
-              </p>
-            </div>
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
+          {caseStudies.map((study, i) => (
+            <Reveal key={study.title} delay={i * 0.08}>
+              <GlassCard className="flex h-full flex-col p-7">
+                <Badge tone="brand">{study.audience}</Badge>
+                <h3 className="mt-4 text-lg font-bold text-navy">
+                  {study.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  {study.body}
+                </p>
+              </GlassCard>
+            </Reveal>
           ))}
         </div>
       </Section>
 
       {/* Final CTA */}
-      <section className="border-t border-slate-200 bg-white py-20">
+      <section className="bg-white py-20">
         <div className="container-page">
-          <div className="relative overflow-hidden rounded-3xl bg-navy px-6 py-16 text-center text-white shadow-glow sm:px-12">
-            <div className="pointer-events-none absolute -right-10 -top-10 size-64 rounded-full bg-brand-500/30 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-10 -left-10 size-64 rounded-full bg-accent-500/20 blur-3xl" />
-            <Eyebrow className="relative text-accent-300">
-              Join the ecosystem
-            </Eyebrow>
-            <h2 className="relative text-3xl font-bold sm:text-4xl">
-              Find your place at ExSell Academy
-            </h2>
-            <p className="relative mx-auto mt-4 max-w-xl text-slate-300">
-              Whether you want to launch a sales career, hire trained talent or
-              fund the next generation — there&apos;s a path here for you.
-            </p>
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-midnight px-6 py-20 text-center text-white shadow-elevated sm:px-12">
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute -right-10 -top-10 size-72 rounded-full bg-brand-500/30 blur-3xl" />
+              <div className="absolute -bottom-10 -left-10 size-72 rounded-full bg-violet-500/25 blur-3xl" />
+            </div>
+            <div className="relative mx-auto max-w-xl">
+              <Eyebrow tone="light">Join the ecosystem</Eyebrow>
+              <h2 className="text-display">Find your place at ExSell Academy</h2>
+              <p className="mt-4 text-slate-300">
+                Whether you want to launch a sales career, hire trained talent or
+                fund the next generation — there&apos;s a path here for you.
+              </p>
+            </div>
             <div className="relative mt-8 flex flex-col flex-wrap justify-center gap-3 sm:flex-row">
               <Link
                 href="/apply"

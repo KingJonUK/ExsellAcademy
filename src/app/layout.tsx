@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
+import { siteConfig } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,7 +17,7 @@ const display = Inter_Tight({
   weight: ["500", "600", "700", "800"],
 });
 
-const siteUrl = "https://exsellacademy.com";
+const siteUrl = siteConfig.url;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -48,6 +50,27 @@ export const metadata: Metadata = {
     description:
       "Certified online sales training, funded learning pathways, and real employer opportunities.",
   },
+  icons: {
+    icon: "/icon",
+    apple: "/apple-icon",
+  },
+  manifest: "/manifest.webmanifest",
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  logo: `${siteConfig.url}/icon`,
+  email: siteConfig.email,
+  sameAs: [
+    siteConfig.social.linkedin,
+    siteConfig.social.instagram,
+    siteConfig.social.tiktok,
+    siteConfig.social.youtube,
+  ],
 };
 
 export default function RootLayout({
@@ -61,6 +84,7 @@ export default function RootLayout({
       className={`${inter.variable} ${display.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-white text-ink antialiased">
+        <JsonLd data={organizationSchema} />
         {children}
       </body>
     </html>

@@ -377,9 +377,14 @@ export function ApplicationForm() {
               />
               <span className="text-sm leading-relaxed text-slate-600">
                 I agree to be contacted by ExSell Academy about my application
-                and consent to my information being handled in line with the
-                privacy terms.
-                <span className="ml-0.5 text-red-500">*</span>
+                and consent to my information being handled in line with the{" "}
+                <Link
+                  href="/privacy"
+                  className="font-semibold text-brand-700 underline-offset-2 hover:text-brand-800 hover:underline"
+                >
+                  privacy terms
+                </Link>
+                .<span className="ml-0.5 text-red-500">*</span>
               </span>
             </label>
             {errors.consent ? (

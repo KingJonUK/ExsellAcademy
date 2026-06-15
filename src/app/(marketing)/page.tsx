@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Hero } from "@/components/home/hero";
@@ -11,6 +12,7 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { GrowLine } from "@/components/ui/grow-line";
 import { buttonVariants } from "@/components/ui/button";
+import { JsonLd } from "@/components/json-ld";
 import { courses } from "@/lib/data/courses";
 import {
   caseStudies,
@@ -23,9 +25,41 @@ import {
   trustBadges,
 } from "@/lib/data/content";
 
+export const metadata: Metadata = {
+  title: {
+    absolute:
+      "ExSell Academy — Certified Sales Training, Funded Learning & Real Careers",
+  },
+  description:
+    "Launch your sales career with ExSell Academy. CPD-certified online courses, funded training places, and direct connections to employers hiring sales-ready talent.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title:
+      "ExSell Academy — Certified Sales Training, Funded Learning & Real Careers",
+    description:
+      "Build real sales skills, earn CPD certification, and get connected with employers. The career launchpad for future sales professionals.",
+    siteName: "ExSell Academy",
+  },
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: generalFaqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={faqSchema} />
       <Hero />
 
       {/* Trust bar */}
