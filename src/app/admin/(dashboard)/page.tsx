@@ -6,8 +6,10 @@ import {
   Clock,
   FileText,
   GraduationCap,
+  Handshake,
   HeartHandshake,
   Inbox,
+  PoundSterling,
 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { Card } from "@/components/ui/card";
@@ -43,6 +45,8 @@ export default async function DashboardPage() {
     sponsorCount,
     publishedCourses,
     fundedAllocations,
+    placementCount,
+    placementFeesDue,
     recent,
   ] = await Promise.all([
     prisma.application.count(),
@@ -52,6 +56,8 @@ export default async function DashboardPage() {
     prisma.application.count({
       where: { status: "APPROVED", assignedCourseId: { not: null } },
     }),
+    prisma.placement.count(),
+    prisma.placement.count({ where: { feeStatus: "PENDING" } }),
     prisma.application.findMany({
       orderBy: { createdAt: "desc" },
       take: 6,
@@ -103,6 +109,18 @@ export default async function DashboardPage() {
       value: sponsorCount,
       icon: HeartHandshake,
       tone: "bg-accent-100 text-accent-800",
+    },
+    {
+      label: "Placements",
+      value: placementCount,
+      icon: Handshake,
+      tone: "bg-brand-50 text-brand-700",
+    },
+    {
+      label: "Fees due",
+      value: placementFeesDue,
+      icon: PoundSterling,
+      tone: "bg-amber-100 text-amber-800",
     },
     {
       label: "Published courses",
