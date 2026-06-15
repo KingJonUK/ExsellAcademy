@@ -3,16 +3,26 @@ import { NextResponse, type NextRequest } from "next/server";
 const ADMIN_COOKIE = "exsell_admin";
 
 // Mirror of adminToken() in src/lib/admin-auth.ts. btoa(...) === Buffer base64
-// for ASCII, so the value set by the server action matches here in edge.
-function expectedToken(): string {
-  const pw = process.env.ADMIN_PASSWORD ?? "exsell-admin";
-  return btoa(`exsell:${pw}`);
+// for ASCII. Returns null when admin must fail closed (production without
+// ADMIN_PASSWORD), so no cookie value can grant access.
+function expectedToken(): string | null {
+  const configured = process.env.ADMIN_PASSWORD;
+  const password =
+    configured && configured.length > 0
+      ? configured
+      : process.env.NODE_ENV === "production"
+        ? null
+        : "exsell-admin";
+  if (!password) return null;
+  return btoa(`exsell:${password}`);
 }
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isLoginPage = pathname === "/admin/login";
-  const authed = req.cookies.get(ADMIN_COOKIE)?.value === expectedToken();
+  const token = expectedToken();
+  const authed =
+    token !== null && req.cookies.get(ADMIN_COOKIE)?.value === token;
 
   if (!authed && !isLoginPage) {
     const url = req.nextUrl.clone();

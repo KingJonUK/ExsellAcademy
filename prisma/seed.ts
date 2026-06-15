@@ -41,7 +41,19 @@ async function seedCourses() {
       create: { slug: course.slug, ...data },
     });
 
-    // Re-seed modules/lessons idempotently.
+    // Deleting modules cascades to lessons and LessonProgress, so never do it
+    // when a course already has real learner progress — skip the reseed and
+    // keep the existing content/data intact.
+    const progressCount = await prisma.lessonProgress.count({
+      where: { lesson: { module: { courseId: saved.id } } },
+    });
+    if (progressCount > 0) {
+      console.log(
+        `Skipping module reseed for ${course.slug} — ${progressCount} learner progress record(s) exist.`,
+      );
+      continue;
+    }
+
     await prisma.module.deleteMany({ where: { courseId: saved.id } });
     for (const [mIndex, mod] of course.modules.entries()) {
       await prisma.module.create({
