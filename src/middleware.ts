@@ -1,39 +1,55 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const ADMIN_COOKIE = "exsell_admin";
-
-// Mirror of adminToken() in src/lib/admin-auth.ts. btoa(...) === Buffer base64
-// for ASCII. Returns null when admin must fail closed (production without
-// ADMIN_PASSWORD), so no cookie value can grant access.
-function expectedToken(): string | null {
-  const configured = process.env.ADMIN_PASSWORD;
+// Mirrors of adminToken()/employerToken(). btoa(...) === Buffer base64 for
+// ASCII, so values match those set by the server actions. A null token means
+// fail closed (production with the password env var unset).
+function tokenFor(prefix: string, envValue: string | undefined, devDefault: string): string | null {
   const password =
-    configured && configured.length > 0
-      ? configured
+    envValue && envValue.length > 0
+      ? envValue
       : process.env.NODE_ENV === "production"
         ? null
-        : "exsell-admin";
+        : devDefault;
   if (!password) return null;
-  return btoa(`exsell:${password}`);
+  return btoa(`${prefix}:${password}`);
+}
+
+type Gate = { cookie: string; token: string | null; login: string; home: string };
+
+function gateFor(pathname: string): Gate {
+  if (pathname.startsWith("/employer")) {
+    return {
+      cookie: "exsell_employer",
+      token: tokenFor("exsell-employer", process.env.EMPLOYER_PASSWORD, "exsell-employer"),
+      login: "/employer/login",
+      home: "/employer",
+    };
+  }
+  return {
+    cookie: "exsell_admin",
+    token: tokenFor("exsell", process.env.ADMIN_PASSWORD, "exsell-admin"),
+    login: "/admin/login",
+    home: "/admin",
+  };
 }
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isLoginPage = pathname === "/admin/login";
-  const token = expectedToken();
+  const gate = gateFor(pathname);
+  const isLoginPage = pathname === gate.login;
   const authed =
-    token !== null && req.cookies.get(ADMIN_COOKIE)?.value === token;
+    gate.token !== null && req.cookies.get(gate.cookie)?.value === gate.token;
 
   if (!authed && !isLoginPage) {
     const url = req.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.search = pathname === "/admin" ? "" : `?next=${encodeURIComponent(pathname)}`;
+    url.pathname = gate.login;
+    url.search = pathname === gate.home ? "" : `?next=${encodeURIComponent(pathname)}`;
     return NextResponse.redirect(url);
   }
 
   if (authed && isLoginPage) {
     const url = req.nextUrl.clone();
-    url.pathname = "/admin";
+    url.pathname = gate.home;
     url.search = "";
     return NextResponse.redirect(url);
   }
@@ -42,5 +58,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  matcher: ["/admin", "/admin/:path*", "/employer", "/employer/:path*"],
 };

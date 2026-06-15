@@ -45,8 +45,8 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     title: "Partner",
     links: [
       { label: "Employers", href: "/employers" },
+      { label: "Employer Portal", href: "/employer" },
       { label: "Sponsors", href: "/sponsors" },
-      { label: "Success Stories", href: "/about#stories" },
       { label: "Contact", href: "/contact" },
     ],
   },

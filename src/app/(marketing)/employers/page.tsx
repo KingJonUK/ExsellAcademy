@@ -211,6 +211,12 @@ export default function EmployersPage() {
               >
                 Book a call
               </Link>
+              <Link
+                href="/employer"
+                className={buttonVariants({ variant: "ghost", size: "lg" })}
+              >
+                Employer login
+              </Link>
             </div>
 
             <p
