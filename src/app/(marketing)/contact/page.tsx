@@ -8,9 +8,9 @@ import {
   GraduationCap,
   Building2,
   HeartHandshake,
+  Sparkles,
 } from "lucide-react";
-import { Eyebrow } from "@/components/ui/section";
-import { Card } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { ContactForm } from "@/components/forms/contact-form";
 import { socialIcons } from "@/components/social-icons";
 import { siteConfig, whatsappLink } from "@/lib/site";
@@ -76,14 +76,27 @@ export default function ContactPage() {
   return (
     <>
       {/* Page header */}
-      <section className="relative overflow-hidden border-b border-slate-200 bg-slate-50 bg-grid">
-        <div className="container-page py-16 sm:py-20 lg:py-24">
+      <section className="relative overflow-hidden bg-aurora">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-50" />
+        <div className="container-page py-20 lg:py-28">
           <div className="max-w-2xl">
-            <Eyebrow>Contact</Eyebrow>
-            <h1 className="text-4xl font-bold tracking-tight text-navy sm:text-5xl">
+            <span
+              className="inline-flex animate-fade-up items-center gap-2 rounded-full border border-brand-100 bg-white/70 px-4 py-1.5 text-sm font-semibold text-brand-700 shadow-soft backdrop-blur"
+              style={{ animationDelay: "40ms" }}
+            >
+              <Sparkles className="size-4 text-violet-500" />
+              Contact
+            </span>
+            <h1
+              className="mt-6 animate-fade-up text-hero text-navy"
+              style={{ animationDelay: "120ms" }}
+            >
               Let&apos;s talk
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-slate-600">
+            <p
+              className="mt-5 animate-fade-up text-lg leading-relaxed text-slate-600"
+              style={{ animationDelay: "240ms" }}
+            >
               Questions about courses, hiring or sponsorship? Send us a message
               or reach out directly — whichever suits you. We aim to reply
               within a couple of working days.
@@ -98,7 +111,7 @@ export default function ContactPage() {
           <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             {/* LEFT — contact details */}
             <div className="space-y-6">
-              <Card className="p-7">
+              <GlassCard className="p-7">
                 <h2 className="text-lg font-bold text-navy">Get in touch</h2>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
                   Prefer to reach us another way? Use any of the channels below.
@@ -153,10 +166,10 @@ export default function ContactPage() {
                     })}
                   </div>
                 </div>
-              </Card>
+              </GlassCard>
 
               {/* Choose your path */}
-              <Card className="p-7">
+              <GlassCard className="p-7">
                 <h2 className="text-lg font-bold text-navy">Choose your path</h2>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
                   Know what you&apos;re after? Jump straight to the right place.
@@ -184,11 +197,11 @@ export default function ContactPage() {
                     </li>
                   ))}
                 </ul>
-              </Card>
+              </GlassCard>
             </div>
 
             {/* RIGHT — form */}
-            <Card className="p-7 sm:p-8">
+            <GlassCard className="p-7 shadow-elevated sm:p-8">
               <h2 className="text-xl font-bold text-navy">Send us a message</h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">
                 Fill in the form and the right person on our team will get back
@@ -197,7 +210,7 @@ export default function ContactPage() {
               <div className="mt-7">
                 <ContactForm />
               </div>
-            </Card>
+            </GlassCard>
           </div>
         </div>
       </section>

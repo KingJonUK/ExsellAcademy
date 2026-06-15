@@ -8,12 +8,19 @@ import {
   Clock,
   MapPin,
   SlidersHorizontal,
+  Sparkles,
+  TrendingUp,
 } from "lucide-react";
-import { Section, SectionHeading, Eyebrow } from "@/components/ui/section";
+import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/reveal";
 import { Icon } from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
+import { GlassCard } from "@/components/ui/glass-card";
+import { GrowLine } from "@/components/ui/grow-line";
+import { ProgressRing } from "@/components/ui/progress-ring";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { employerBenefits, candidateFilters } from "@/lib/data/content";
 
 export const metadata: Metadata = {
@@ -158,24 +165,39 @@ export default function EmployersPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-200 bg-slate-50 bg-grid">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-24 -top-24 size-96 rounded-full bg-brand-200/40 blur-3xl" />
-          <div className="absolute -right-16 top-32 size-96 rounded-full bg-accent-200/40 blur-3xl" />
-        </div>
-        <div className="container-page py-16 sm:py-20 lg:py-24">
-          <div className="max-w-3xl">
-            <Eyebrow>For employers</Eyebrow>
-            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-navy sm:text-5xl lg:text-6xl">
+      <section className="relative overflow-hidden bg-aurora">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-50" />
+        <div className="container-page grid items-center gap-12 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
+          <div>
+            <span
+              className="inline-flex animate-fade-up items-center gap-2 rounded-full border border-brand-100 bg-white/70 px-4 py-1.5 text-sm font-semibold text-brand-700 shadow-soft backdrop-blur"
+              style={{ animationDelay: "40ms" }}
+            >
+              <Sparkles className="size-4 text-violet-500" />
+              For employers
+            </span>
+
+            <h1
+              className="mt-6 animate-fade-up text-hero text-navy"
+              style={{ animationDelay: "120ms" }}
+            >
               Hire sales-ready talent before your{" "}
               <span className="text-gradient">competitors do</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-600">
+
+            <p
+              className="mt-5 max-w-xl animate-fade-up text-lg leading-relaxed text-slate-600"
+              style={{ animationDelay: "240ms" }}
+            >
               Skip the unproven CVs. Browse certified candidates whose
               communication and selling ability have already been assessed, then
               shortlist and interview with confidence.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+
+            <div
+              className="mt-8 flex animate-fade-up flex-col gap-3 sm:flex-row sm:flex-wrap"
+              style={{ animationDelay: "300ms" }}
+            >
               <Link
                 href="/contact"
                 className={buttonVariants({ variant: "primary", size: "lg" })}
@@ -190,7 +212,17 @@ export default function EmployersPage() {
                 Book a call
               </Link>
             </div>
+
+            <p
+              className="mt-6 animate-fade-up text-sm text-slate-500"
+              style={{ animationDelay: "360ms" }}
+            >
+              Free to browse · Pay only on a successful hire · 30 / 60 / 90-day
+              support
+            </p>
           </div>
+
+          <EmployerHeroVisual />
         </div>
       </section>
 
@@ -201,10 +233,10 @@ export default function EmployersPage() {
           title="The problem with entry-level hiring"
           description="Finding motivated, trained junior sales people is hard — and the usual process leaves you guessing until it's too late."
         />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {hiringPains.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.05}>
-              <div className="h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <Reveal key={item.title} delay={i * 0.06}>
+              <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
                 <span className="grid size-11 place-items-center rounded-xl bg-red-50 text-red-500">
                   <Icon name={item.icon} className="size-5" />
                 </span>
@@ -222,14 +254,18 @@ export default function EmployersPage() {
       <Section className="bg-slate-50">
         <SectionHeading
           eyebrow="The solution"
+          eyebrowTone="violet"
           title="The ExSell solution"
           description="Every candidate in our network is trained, assessed and certified before they reach your shortlist."
         />
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {employerBenefits.map((benefit, i) => (
-            <Reveal key={benefit.title} delay={i * 0.06}>
-              <div className="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-soft">
-                <span className="grid size-12 place-items-center rounded-xl bg-brand-600 text-white">
+            <Reveal key={benefit.title} delay={i * 0.08}>
+              <GlassCard className="relative h-full overflow-hidden p-8">
+                <span className="absolute right-5 top-3 font-display text-7xl font-extrabold text-slate-900/[0.04]">
+                  {i + 1}
+                </span>
+                <span className="relative grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow">
                   <Icon name={benefit.icon} className="size-6" />
                 </span>
                 <h3 className="mt-5 text-lg font-bold text-navy">
@@ -238,7 +274,7 @@ export default function EmployersPage() {
                 <p className="mt-2 leading-relaxed text-slate-600">
                   {benefit.description}
                 </p>
-              </div>
+              </GlassCard>
             </Reveal>
           ))}
         </div>
@@ -251,12 +287,12 @@ export default function EmployersPage() {
           title="The Talent Readiness Score"
           description="A single, transparent measure of how prepared a candidate is — built from six assessed dimensions, so you know what you're getting before you interview."
         />
-        <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:items-center">
+        <div className="mt-14 grid gap-8 lg:grid-cols-2 lg:items-center">
           {/* Checklist of components */}
           <div className="grid gap-4 sm:grid-cols-2">
             {readinessComponents.map((c, i) => (
-              <Reveal key={c.label} delay={i * 0.05}>
-                <div className="flex h-full gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-soft">
+              <Reveal key={c.label} delay={i * 0.06}>
+                <GlassCard className="flex h-full gap-3 p-5">
                   <CircleCheckBig className="mt-0.5 size-5 shrink-0 text-accent-600" />
                   <div>
                     <h3 className="text-sm font-bold text-navy">{c.label}</h3>
@@ -264,15 +300,16 @@ export default function EmployersPage() {
                       {c.description}
                     </p>
                   </div>
-                </div>
+                </GlassCard>
               </Reveal>
             ))}
           </div>
 
           {/* Illustrative candidate card on a dark panel */}
           <Reveal delay={0.1}>
-            <div className="relative overflow-hidden rounded-3xl bg-navy p-8 text-white shadow-glow">
+            <div className="relative overflow-hidden rounded-[2rem] bg-midnight p-8 text-white shadow-elevated">
               <div className="pointer-events-none absolute -right-10 -top-10 size-56 rounded-full bg-brand-500/30 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-12 -left-8 size-48 rounded-full bg-violet-600/25 blur-3xl" />
               <div className="relative flex items-center justify-between">
                 <Badge tone="accent">Illustrative profile</Badge>
                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-300">
@@ -302,7 +339,7 @@ export default function EmployersPage() {
                 </div>
               </div>
 
-              <div className="relative mt-7 flex items-end justify-between rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+              <div className="relative mt-7 flex items-center justify-between gap-4 rounded-2xl glass-dark p-5">
                 <div>
                   <p className="text-sm font-semibold text-slate-300">
                     Talent Readiness Score
@@ -311,10 +348,17 @@ export default function EmployersPage() {
                     Sample value for illustration
                   </p>
                 </div>
-                <p className="font-display text-4xl font-extrabold text-white">
-                  87
-                  <span className="text-xl text-slate-400">/100</span>
-                </p>
+                <ProgressRing
+                  value={87}
+                  size={92}
+                  stroke={9}
+                  trackClassName="text-white/10"
+                  ringClassName="text-accent-400"
+                >
+                  <span className="font-display text-2xl font-extrabold text-white">
+                    <AnimatedCounter value={87} />
+                  </span>
+                </ProgressRing>
               </div>
 
               <div className="relative mt-6 grid grid-cols-2 gap-3 text-sm">
@@ -345,24 +389,27 @@ export default function EmployersPage() {
           title="How placements work"
           description="A clear path from browsing the talent pool to a supported, successful hire."
         />
-        <ol className="mt-12 grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-6">
-          {placementSteps.map((step, i) => (
-            <li key={step.title} className="flex flex-col items-center text-center">
-              <span className="relative grid size-12 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
-                <Icon name={step.icon} className="size-6" />
-                <span className="absolute -right-2 -top-2 grid size-5 place-items-center rounded-full bg-brand-600 text-[10px] font-bold text-white">
-                  {i + 1}
+        <div className="relative mt-16">
+          <GrowLine className="absolute inset-x-0 top-7 hidden h-0.5 bg-gradient-to-r from-brand-500 via-violet-500 to-accent-500 lg:block" />
+          <ol className="relative grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-6">
+            {placementSteps.map((step, i) => (
+              <li key={step.title} className="flex flex-col items-center text-center">
+                <span className="relative grid size-14 place-items-center rounded-2xl border border-slate-200 bg-white text-brand-600 shadow-soft">
+                  <Icon name={step.icon} className="size-6" />
+                  <span className="absolute -right-2 -top-2 grid size-5 place-items-center rounded-full bg-brand-600 text-[10px] font-bold text-white">
+                    {i + 1}
+                  </span>
                 </span>
-              </span>
-              <h3 className="mt-3 text-sm font-bold text-navy">{step.title}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                {step.description}
-              </p>
-            </li>
-          ))}
-        </ol>
+                <h3 className="mt-3 text-sm font-bold text-navy">{step.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                  {step.description}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
 
-        <div className="mt-12 rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+        <GlassCard className="mt-12 p-6">
           <div className="flex items-center gap-2 text-sm font-semibold text-navy">
             <SlidersHorizontal className="size-4 text-brand-600" />
             Filter by
@@ -374,7 +421,7 @@ export default function EmployersPage() {
               </Badge>
             ))}
           </div>
-        </div>
+        </GlassCard>
       </Section>
 
       {/* Pricing model */}
@@ -384,31 +431,54 @@ export default function EmployersPage() {
           title="A success-based pricing model"
           description="Browsing is free. You only pay when you successfully hire — so the risk stays with us, not you."
         />
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {pricingTiers.map((tier, i) => (
-            <Reveal key={tier.name} delay={i * 0.08}>
-              <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-soft">
-                <span className="grid size-12 place-items-center rounded-xl bg-brand-50 text-brand-600">
-                  <Icon name={tier.icon} className="size-6" />
-                </span>
-                <h3 className="mt-5 text-lg font-bold text-navy">{tier.name}</h3>
-                <p className="mt-1 text-sm font-semibold text-brand-600">
-                  {tier.highlight}
-                </p>
-                <p className="mt-3 leading-relaxed text-slate-600">
-                  {tier.description}
-                </p>
-                <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-5">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex gap-2.5 text-sm">
-                      <Check className="mt-0.5 size-4 shrink-0 text-accent-600" />
-                      <span className="text-slate-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Reveal>
-          ))}
+        <div className="mt-12 grid items-start gap-6 md:grid-cols-3">
+          {pricingTiers.map((tier, i) => {
+            const featured = i === 1;
+            return (
+              <Reveal key={tier.name} delay={i * 0.08}>
+                <div
+                  className={cn(
+                    "relative flex h-full flex-col rounded-3xl p-7 shadow-md",
+                    featured
+                      ? "gradient-border bg-white ring-1 ring-brand-500/20 md:scale-[1.03]"
+                      : "border border-slate-200 bg-white shadow-soft",
+                  )}
+                >
+                  {featured ? (
+                    <Badge tone="brand" className="absolute -top-3 left-7 shadow-soft">
+                      <Sparkles className="size-3.5" />
+                      Most popular
+                    </Badge>
+                  ) : null}
+                  <span
+                    className={cn(
+                      "grid size-12 place-items-center rounded-2xl",
+                      featured
+                        ? "bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow"
+                        : "bg-brand-50 text-brand-600",
+                    )}
+                  >
+                    <Icon name={tier.icon} className="size-6" />
+                  </span>
+                  <h3 className="mt-5 text-lg font-bold text-navy">{tier.name}</h3>
+                  <p className="mt-1 text-sm font-semibold text-brand-600">
+                    {tier.highlight}
+                  </p>
+                  <p className="mt-3 leading-relaxed text-slate-600">
+                    {tier.description}
+                  </p>
+                  <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-5">
+                    {tier.features.map((feature) => (
+                      <li key={feature} className="flex gap-2.5 text-sm">
+                        <Check className="mt-0.5 size-4 shrink-0 text-accent-600" />
+                        <span className="text-slate-600">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
         <p className="mx-auto mt-8 max-w-2xl text-center text-sm text-slate-500">
           Exact placement fees are agreed with you up front and depend on role
@@ -417,12 +487,14 @@ export default function EmployersPage() {
       </Section>
 
       {/* Final CTA */}
-      <section className="border-t border-slate-200 bg-white py-20">
+      <section className="bg-white py-20">
         <div className="container-page">
-          <div className="relative overflow-hidden rounded-3xl bg-navy px-6 py-16 text-center text-white shadow-glow sm:px-12">
-            <div className="pointer-events-none absolute -right-10 -top-10 size-64 rounded-full bg-brand-500/30 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-10 -left-10 size-64 rounded-full bg-accent-500/20 blur-3xl" />
-            <h2 className="relative text-3xl font-bold sm:text-4xl">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-midnight px-6 py-20 text-center text-white shadow-elevated sm:px-12">
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute -right-10 -top-10 size-72 rounded-full bg-brand-500/30 blur-3xl" />
+              <div className="absolute -bottom-10 -left-10 size-72 rounded-full bg-violet-500/25 blur-3xl" />
+            </div>
+            <h2 className="relative text-display">
               Ready to meet your next sales hire?
             </h2>
             <p className="relative mx-auto mt-4 max-w-xl text-slate-300">
@@ -448,5 +520,83 @@ export default function EmployersPage() {
         </div>
       </section>
     </>
+  );
+}
+
+function EmployerHeroVisual() {
+  return (
+    <div
+      className="relative mx-auto hidden h-[460px] w-full max-w-md animate-fade-in lg:block"
+      style={{ animationDelay: "200ms" }}
+    >
+      {/* main glass panel — shortlist preview */}
+      <div className="absolute inset-x-0 top-8 rounded-3xl glass-card p-6 shadow-elevated">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-slate-500">Your shortlist</p>
+            <p className="font-display text-2xl font-extrabold text-navy">
+              Certified talent
+            </p>
+            <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-accent-600">
+              <BadgeCheck className="size-3.5" /> All CPD assessed
+            </span>
+          </div>
+          <ProgressRing value={87} size={88} stroke={9}>
+            <span className="font-display text-xl font-extrabold text-navy">
+              <AnimatedCounter value={87} />
+            </span>
+          </ProgressRing>
+        </div>
+        <div className="mt-6 space-y-3">
+          {[
+            { name: "Sofia A.", role: "SDR · London", score: 87 },
+            { name: "Marcus T.", role: "Sales Exec · Leeds", score: 82 },
+            { name: "Priya N.", role: "SDR · Remote", score: 79 },
+          ].map((c) => (
+            <div
+              key={c.name}
+              className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid size-9 place-items-center rounded-xl bg-brand-50 font-display text-sm font-extrabold text-brand-700">
+                  {c.name.charAt(0)}
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-navy">{c.name}</p>
+                  <p className="text-xs text-slate-500">{c.role}</p>
+                </div>
+              </div>
+              <span className="font-display text-lg font-extrabold text-navy">
+                {c.score}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* floating placed card */}
+      <div className="absolute -left-6 bottom-3 w-56 animate-float rounded-2xl glass-card p-4 shadow-md">
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 place-items-center rounded-xl bg-accent-100 text-accent-700">
+            <TrendingUp className="size-5" />
+          </span>
+          <div>
+            <p className="text-xs font-semibold text-navy">Placed</p>
+            <p className="text-xs text-slate-500">Pay only on success</p>
+          </div>
+        </div>
+      </div>
+
+      {/* floating availability card */}
+      <div className="absolute -right-4 top-0 flex w-44 animate-float-slow items-center gap-2 rounded-2xl glass-card p-3 shadow-md">
+        <span className="grid size-9 place-items-center rounded-lg bg-brand-50 text-brand-600">
+          <Clock className="size-5" />
+        </span>
+        <div>
+          <p className="text-xs font-semibold text-navy">Available now</p>
+          <p className="text-[11px] text-slate-500">Ready to interview</p>
+        </div>
+      </div>
+    </div>
   );
 }

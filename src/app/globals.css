@@ -1,56 +1,75 @@
 @import "tailwindcss";
 
 /*
-  ExSell Academy design system
+  ExSell Academy — "Modern SaaS Luxury" design system.
   --------------------------------------------------------------------------
-  Brand: deep professional blue + growth green, on clean whites and light greys.
-  Built on Tailwind v4 design tokens via @theme.
+  Benchmark: Stripe / Linear / Arc / Notion / MasterClass.
+  Brand colours are used as accents on generous white space; glass panels,
+  gradient borders, depth shadows, big confident type and tasteful motion.
+  Built on Tailwind v4 tokens via @theme.
 */
 
 @theme {
-  /* Brand blue scale (deep professional blue) */
-  --color-brand-50: #eef5ff;
-  --color-brand-100: #d9e8ff;
-  --color-brand-200: #bcd6ff;
-  --color-brand-300: #8ebcff;
-  --color-brand-400: #5996fb;
-  --color-brand-500: #3372f4;
-  --color-brand-600: #1d52e0;
-  --color-brand-700: #1a40c4;
-  --color-brand-800: #1c389f;
-  --color-brand-900: #1d347e;
-  --color-brand-950: #0b1f4e;
+  /* Brand blue — primary accent (#2563EB) */
+  --color-brand-50: #eff4ff;
+  --color-brand-100: #dbe6fe;
+  --color-brand-200: #bfd3fe;
+  --color-brand-300: #93b4fd;
+  --color-brand-400: #608ffa;
+  --color-brand-500: #3b6df5;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+  --color-brand-950: #172554;
 
-  /* Growth green accent scale */
-  --color-accent-50: #eafff4;
-  --color-accent-100: #cdfee2;
-  --color-accent-200: #9ffac9;
-  --color-accent-300: #5ff0a7;
-  --color-accent-400: #22dd82;
-  --color-accent-500: #07c46a;
-  --color-accent-600: #009f56;
-  --color-accent-700: #017d47;
-  --color-accent-800: #06623a;
-  --color-accent-900: #065132;
-  --color-accent-950: #002d1a;
+  /* Success / growth green (#22C55E) */
+  --color-accent-50: #f0fdf4;
+  --color-accent-100: #dcfce7;
+  --color-accent-200: #bbf7d0;
+  --color-accent-300: #86efac;
+  --color-accent-400: #4ade80;
+  --color-accent-500: #22c55e;
+  --color-accent-600: #16a34a;
+  --color-accent-700: #15803d;
+  --color-accent-800: #166534;
+  --color-accent-900: #14532d;
+  --color-accent-950: #052e16;
 
-  /* Deep navy used for dark sections */
-  --color-navy: #081634;
-  --color-ink: #0c1322;
+  /* Accent purple (#7C3AED) — used sparingly for modernity */
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #4c1d95;
+  --color-violet-950: #2e1065;
+
+  /* Dark sections + near-black text */
+  --color-midnight: #0b1220;
+  --color-navy: #0b1220;
+  --color-ink: #0f172a;
 
   /* Fonts (wired up in layout.tsx via next/font) */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, sans-serif;
 
   /* Extra radius */
   --radius-4xl: 2rem;
+  --radius-5xl: 2.5rem;
 
   /* Named animations */
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-fade-in: fade-in 0.8s ease both;
   --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 9s ease-in-out infinite;
   --animate-marquee: marquee 34s linear infinite;
   --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-aurora: aurora 18s ease-in-out infinite;
 }
 
 @keyframes fade-up {
@@ -101,9 +120,21 @@
   }
 }
 
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.08);
+    opacity: 0.9;
+  }
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #0c1322;
+  --foreground: #0f172a;
 }
 
 @layer base {
@@ -129,13 +160,13 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 
   ::selection {
-    background: var(--color-accent-300);
-    color: var(--color-navy);
+    background: var(--color-brand-600);
+    color: white;
   }
 }
 
@@ -154,44 +185,125 @@
     }
   }
 
-  /* Gradient brand text */
+  @media (min-width: 1536px) {
+    .container-page {
+      padding-inline: 3rem;
+    }
+  }
+
+  /* Big, confident hero type — ~40px to ~72px fluid */
+  .text-hero {
+    font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+    line-height: 1.03;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+  }
+
+  /* Section heading scale — ~30px to ~44px fluid */
+  .text-display {
+    font-size: clamp(1.875rem, 3.2vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+  }
+
+  /* Brand → violet gradient text */
   .text-gradient {
     background-image: linear-gradient(
-      90deg,
+      100deg,
       var(--color-brand-600),
-      var(--color-accent-500)
+      var(--color-violet-600)
     );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
-  /* Frosted glass panel */
+  /* Frosted glass (light) — used by floating nav and light panels */
   .glass {
-    background: color-mix(in srgb, white 70%, transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: color-mix(in srgb, white 72%, transparent);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
   }
 
-  /* Soft elevated card shadow */
+  /* Glass card on light backgrounds */
+  .glass-card {
+    background: color-mix(in srgb, white 78%, transparent);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid color-mix(in srgb, white 60%, transparent);
+  }
+
+  /* Glass card on dark backgrounds */
+  .glass-dark {
+    background: color-mix(in srgb, white 6%, transparent);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid color-mix(in srgb, white 12%, transparent);
+  }
+
+  /* 1px gradient ring around a rounded element (uses border-radius: inherit) */
+  .gradient-border {
+    position: relative;
+    isolation: isolate;
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--color-brand-500) 70%, transparent),
+      color-mix(in srgb, var(--color-violet-500) 60%, transparent),
+      color-mix(in srgb, var(--color-accent-400) 50%, transparent)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Tiered depth shadows (soft, premium) */
   .shadow-soft {
     box-shadow:
-      0 1px 2px rgba(8, 22, 52, 0.04),
-      0 12px 32px -12px rgba(8, 22, 52, 0.18);
+      0 1px 2px rgba(11, 18, 32, 0.04),
+      0 10px 30px -14px rgba(11, 18, 32, 0.16);
   }
-
+  .shadow-md {
+    box-shadow:
+      0 2px 6px rgba(11, 18, 32, 0.05),
+      0 18px 48px -18px rgba(11, 18, 32, 0.22);
+  }
+  .shadow-elevated {
+    box-shadow:
+      0 4px 10px rgba(11, 18, 32, 0.06),
+      0 30px 70px -24px rgba(11, 18, 32, 0.3);
+  }
   .shadow-glow {
-    box-shadow: 0 18px 60px -20px color-mix(in srgb, var(--color-brand-600) 55%, transparent);
+    box-shadow: 0 24px 70px -22px color-mix(in srgb, var(--color-brand-600) 50%, transparent);
   }
 
   /* Subtle dotted grid background */
   .bg-grid {
     background-image: radial-gradient(
       circle at 1px 1px,
-      color-mix(in srgb, var(--color-slate-300) 60%, transparent) 1px,
+      color-mix(in srgb, var(--color-slate-300) 55%, transparent) 1px,
       transparent 0
     );
     background-size: 28px 28px;
+  }
+
+  /* Soft aurora gradient mesh for hero/feature backgrounds */
+  .bg-aurora {
+    background-image:
+      radial-gradient(40rem 30rem at 12% -10%, color-mix(in srgb, var(--color-brand-200) 55%, transparent), transparent 60%),
+      radial-gradient(34rem 26rem at 95% 0%, color-mix(in srgb, var(--color-violet-200) 50%, transparent), transparent 60%),
+      radial-gradient(34rem 28rem at 60% 110%, color-mix(in srgb, var(--color-accent-200) 45%, transparent), transparent 60%);
   }
 }
 

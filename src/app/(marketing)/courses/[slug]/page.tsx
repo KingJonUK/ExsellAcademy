@@ -15,10 +15,12 @@ import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/reveal";
 import { Icon } from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { CourseCard } from "@/components/course-card";
 import { buttonVariants } from "@/components/ui/button";
+import { JsonLd } from "@/components/json-ld";
 import { courses, getCourse } from "@/lib/data/courses";
+import { siteConfig } from "@/lib/site";
 import { formatHours, formatPrice } from "@/lib/utils";
 
 export function generateStaticParams() {
@@ -82,7 +84,7 @@ function EnrolCard({ course }: { course: Course }) {
   ];
 
   return (
-    <Card className="p-7 lg:sticky lg:top-24">
+    <GlassCard className="p-7 shadow-elevated lg:sticky lg:top-24">
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-400">
           Enrol
@@ -92,7 +94,7 @@ function EnrolCard({ course }: { course: Course }) {
         </Badge>
       </div>
 
-      <dl className="mt-5 divide-y divide-slate-100">
+      <dl className="mt-5 divide-y divide-slate-200/70">
         {facts.map((fact) => (
           <div
             key={fact.label}
@@ -128,7 +130,7 @@ function EnrolCard({ course }: { course: Course }) {
           Ask a question
         </Link>
       </div>
-    </Card>
+    </GlassCard>
   );
 }
 
@@ -149,10 +151,46 @@ export default async function Page({
     .filter((c) => c.slug !== course.slug)
     .slice(0, 3);
 
+  const courseUrl = `${siteConfig.url}/courses/${course.slug}`;
+  const courseSchema = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description: course.subtitle,
+    url: courseUrl,
+    timeRequired: `PT${course.durationHours}H`,
+    educationalCredentialAwarded: course.certificate
+      ? "CPD-recognised certificate"
+      : undefined,
+    provider: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      sameAs: siteConfig.url,
+    },
+  };
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Courses",
+        item: `${siteConfig.url}/courses`,
+      },
+      { "@type": "ListItem", position: 3, name: course.title, item: courseUrl },
+    ],
+  };
+
   return (
     <>
+      <JsonLd data={courseSchema} />
+      <JsonLd data={breadcrumbSchema} />
+
       {/* Hero */}
-      <section className="border-b border-slate-200 bg-slate-50">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-aurora">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-50" />
         <div className="container-page py-12 sm:py-14 lg:py-16">
           {/* Breadcrumb */}
           <nav
@@ -183,9 +221,12 @@ export default async function Page({
                 <Badge tone="outline">{course.category}</Badge>
               </div>
 
-              <h1 className="mt-5 text-4xl font-bold tracking-tight text-navy sm:text-5xl">
-                {course.title}
-              </h1>
+              <div className="mt-6 flex items-start gap-4">
+                <span className="hidden size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-glow sm:grid">
+                  <Icon name={course.icon} className="size-7" />
+                </span>
+                <h1 className="text-display text-navy">{course.title}</h1>
+              </div>
               <p className="mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
                 {course.subtitle}
               </p>
@@ -227,9 +268,7 @@ export default async function Page({
             {/* About */}
             <Reveal>
               <div>
-                <h2 className="text-2xl font-bold text-navy">
-                  About this course
-                </h2>
+                <h2 className="text-display text-navy">About this course</h2>
                 <p className="mt-4 text-lg leading-relaxed text-slate-600">
                   {course.description}
                 </p>
@@ -239,17 +278,21 @@ export default async function Page({
             {/* What you'll learn */}
             <Reveal delay={0.05}>
               <div>
-                <h2 className="text-2xl font-bold text-navy">
+                <h2 className="text-display text-navy">
                   What you&apos;ll learn
                 </h2>
-                <ul className="mt-5 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                <ul className="mt-6 grid gap-x-6 gap-y-3 sm:grid-cols-2">
                   {course.outcomes.map((outcome) => (
-                    <li key={outcome} className="flex gap-3">
-                      <CircleCheckBig
-                        className="mt-0.5 size-5 shrink-0 text-accent-600"
-                        aria-hidden="true"
-                      />
-                      <span className="text-slate-600">{outcome}</span>
+                    <li
+                      key={outcome}
+                      className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft"
+                    >
+                      <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-accent-100 text-accent-700">
+                        <CircleCheckBig className="size-4" aria-hidden="true" />
+                      </span>
+                      <span className="text-sm leading-relaxed text-slate-600">
+                        {outcome}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -259,10 +302,10 @@ export default async function Page({
             {/* Skills */}
             <Reveal delay={0.1}>
               <div>
-                <h2 className="text-2xl font-bold text-navy">
+                <h2 className="text-display text-navy">
                   Skills you&apos;ll gain
                 </h2>
-                <div className="mt-5 flex flex-wrap gap-2.5">
+                <div className="mt-6 flex flex-wrap gap-2.5">
                   {course.skills.map((skill) => (
                     <Badge key={skill} tone="brand" className="px-3.5 py-1.5">
                       {skill}
@@ -276,7 +319,7 @@ export default async function Page({
             <Reveal delay={0.15}>
               <div>
                 <div className="flex flex-wrap items-end justify-between gap-3">
-                  <h2 className="text-2xl font-bold text-navy">Curriculum</h2>
+                  <h2 className="text-display text-navy">Curriculum</h2>
                   <p className="text-sm font-medium text-slate-500">
                     {course.modules.length} modules · {totalLessons} lessons
                   </p>
@@ -286,10 +329,10 @@ export default async function Page({
                   {course.modules.map((module, moduleIndex) => (
                     <div
                       key={module.title}
-                      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft"
+                      className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-shadow duration-300 hover:shadow-md"
                     >
                       <div className="flex items-center gap-4 border-b border-slate-100 bg-slate-50 px-5 py-4">
-                        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-600 text-sm font-bold text-white">
+                        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-600 to-violet-600 text-sm font-bold text-white shadow-glow">
                           {moduleIndex + 1}
                         </span>
                         <div>
@@ -305,7 +348,7 @@ export default async function Page({
                         {module.lessons.map((lesson) => (
                           <li
                             key={lesson.title}
-                            className="flex items-center gap-3 px-5 py-3"
+                            className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-slate-50/70"
                           >
                             <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-brand-50 ring-1 ring-brand-100">
                               <LessonTypeIcon type={lesson.type} />
@@ -328,7 +371,9 @@ export default async function Page({
 
           {/* Right column — enrol card */}
           <aside>
-            <EnrolCard course={course} />
+            <Reveal delay={0.05}>
+              <EnrolCard course={course} />
+            </Reveal>
           </aside>
         </div>
       </Section>
@@ -343,8 +388,10 @@ export default async function Page({
             description="Build on what you've learnt with the next step in your sales career."
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {relatedCourses.map((related) => (
-              <CourseCard key={related.slug} course={related} />
+            {relatedCourses.map((related, i) => (
+              <Reveal key={related.slug} delay={i * 0.06}>
+                <CourseCard course={related} className="h-full" />
+              </Reveal>
             ))}
           </div>
         </Section>

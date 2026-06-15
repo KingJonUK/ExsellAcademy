@@ -4,37 +4,39 @@ import {
   ArrowRight,
   Award,
   BookOpen,
-  CircleCheckBig,
   Clock,
   GraduationCap,
   PlayCircle,
   Sparkles,
+  TrendingUp,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GlassCard } from "@/components/ui/glass-card";
+import { Reveal } from "@/components/reveal";
 import { buttonVariants } from "@/components/ui/button";
 import { Icon } from "@/components/icon";
-import { ProgressRing } from "@/components/dashboard/progress-ring";
+import { ProgressRing } from "@/components/ui/progress-ring";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { StatTile } from "@/components/dashboard/stat-tile";
+import { CareerReadiness } from "@/components/dashboard/career-readiness";
+import { CertificationJourney } from "@/components/dashboard/certification-journey";
 import { getCourse } from "@/lib/data/courses";
 import { pathway } from "@/lib/data/content";
 import type { Course } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Learner Dashboard",
 };
 
-const READINESS = 87;
-
 /** Sample learner state — preview only, no auth or persistence. */
-const inProgress: { course: Course; progress: number }[] = [
-  { course: getCourse("prospecting-essentials")!, progress: 64 },
-  { course: getCourse("ai-for-sales")!, progress: 38 },
-  { course: getCourse("interview-readiness")!, progress: 20 },
-];
+const TALENT_SCORE = 87;
+const READINESS = 78;
 
-const recommended = getCourse("objection-handling")!;
+const inProgress: { course: Course; progress: number; tone: BarTone }[] = [
+  { course: getCourse("prospecting-essentials")!, progress: 64, tone: "brand" },
+  { course: getCourse("ai-for-sales")!, progress: 38, tone: "violet" },
+  { course: getCourse("interview-readiness")!, progress: 20, tone: "accent" },
+];
 
 const certificates = [
   {
@@ -56,104 +58,104 @@ const COMPLETED_STEPS = 3;
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-10">
       {/* Welcome header */}
-      <div>
+      <Reveal>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-display text-2xl font-extrabold text-navy sm:text-3xl">
-            Welcome back, Sofia <span aria-hidden="true">👋</span>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl">
+            Welcome back, Sofia
           </h1>
           <Badge tone="brand">
             <Sparkles className="size-3.5" aria-hidden="true" />
             Preview
           </Badge>
         </div>
-        <p className="mt-2 text-slate-600">
-          You&apos;re making great progress. Keep your momentum up to raise your
-          talent readiness and unlock the employer network.
+        <p className="mt-3 max-w-2xl text-lg leading-relaxed text-slate-600">
+          You&apos;re making great progress. Keep your momentum to raise your
+          Talent Score and unlock the employer network.
         </p>
+      </Reveal>
+
+      {/* Hero stat row: Talent Score panel + stat tiles */}
+      <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
+        <Reveal>
+          <TalentScorePanel />
+        </Reveal>
+
+        <Reveal delay={0.08}>
+          <div className="grid h-full gap-5 sm:grid-cols-2">
+            <StatTile
+              icon={BookOpen}
+              value={3}
+              label="Courses in progress"
+              tone="brand"
+            />
+            <StatTile
+              icon={Award}
+              value={2}
+              label="Certificates earned"
+              tone="accent"
+            />
+            <StatTile
+              icon={Clock}
+              value={24}
+              label="CPD hours"
+              tone="violet"
+              hint="Across the full pathway"
+            />
+            <StatTile
+              icon={GraduationCap}
+              value={COMPLETED_STEPS}
+              suffix={`/${pathway.length}`}
+              label="Pathway steps"
+              tone="brand"
+              hint="On track to get hired"
+            />
+          </div>
+        </Reveal>
       </div>
 
-      {/* Stat tiles */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatTile
-          visual={<ProgressRing value={READINESS} size={56} strokeWidth={5} />}
-          value={`${READINESS}/100`}
-          label="Talent readiness"
-        />
-        <StatTile icon={BookOpen} value={3} label="Courses in progress" />
-        <StatTile
-          icon={Award}
-          value={2}
-          label="Certificates earned"
-          tone="accent"
-        />
-        <StatTile icon={Clock} value={24} label="CPD hours" />
-      </div>
-
-      {/* Two-column: readiness panel + continue learning */}
-      <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        {/* Talent readiness panel */}
-        <Card className="flex flex-col">
-          <div className="flex items-center justify-between gap-3">
+      {/* Career readiness meter */}
+      <Reveal>
+        <GlassCard className="p-7">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
             <div>
-              <h2 className="text-lg font-bold text-navy">Talent readiness</h2>
+              <h2 className="text-lg font-bold text-navy">Career readiness</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Your live employability score
+                How close you are to being interview-ready for employers
               </p>
             </div>
-            <ProgressRing value={READINESS} size={104} strokeWidth={8} />
+            <span className="font-display text-2xl font-extrabold text-navy">
+              <AnimatedCounter value={READINESS} suffix="%" />
+            </span>
           </div>
-          <div className="mt-6 rounded-xl bg-slate-50 p-4">
-            <p className="text-sm font-semibold text-navy">
-              What raises your score
+          <CareerReadiness value={READINESS} className="mt-6" />
+        </GlassCard>
+      </Reveal>
+
+      {/* Continue learning */}
+      <section className="space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-navy">Continue learning</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Pick up where you left off
             </p>
-            <ul className="mt-3 space-y-2.5 text-sm text-slate-600">
-              <li className="flex items-start gap-2.5">
-                <CircleCheckBig
-                  className="mt-0.5 size-4 shrink-0 text-accent-600"
-                  aria-hidden="true"
-                />
-                Finishing your in-progress courses
-              </li>
-              <li className="flex items-start gap-2.5">
-                <CircleCheckBig
-                  className="mt-0.5 size-4 shrink-0 text-accent-600"
-                  aria-hidden="true"
-                />
-                Passing assessments first time
-              </li>
-              <li className="flex items-start gap-2.5">
-                <CircleCheckBig
-                  className="mt-0.5 size-4 shrink-0 text-accent-600"
-                  aria-hidden="true"
-                />
-                Submitting a scored sales role-play
-              </li>
-            </ul>
           </div>
-        </Card>
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700"
+          >
+            All courses
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
 
-        {/* Continue learning */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-navy">Continue learning</h2>
-            <Link
-              href="#"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
-            >
-              My courses
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </div>
-
-          <div className="space-y-3">
-            {inProgress.map(({ course, progress }) => (
-              <Card
-                key={course.slug}
-                className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center"
-              >
-                <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
+        <div className="space-y-4">
+          {inProgress.map(({ course, progress, tone }, i) => (
+            <Reveal key={course.slug} delay={i * 0.06}>
+              <GlassCard className="flex flex-col gap-4 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated sm:flex-row sm:items-center sm:gap-5">
+                <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-violet-50 text-brand-600 ring-1 ring-brand-100">
                   <Icon name={course.icon} className="size-6" />
                 </span>
 
@@ -166,12 +168,11 @@ export default function DashboardPage() {
                       {progress}%
                     </span>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className="h-full rounded-full bg-brand-500"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
+                  <p className="mt-0.5 truncate text-xs text-slate-500">
+                    {course.category} · {course.durationHours} hrs ·{" "}
+                    {course.cpdHours} CPD
+                  </p>
+                  <ProgressBar value={progress} tone={tone} className="mt-3" />
                 </div>
 
                 <Link
@@ -185,94 +186,17 @@ export default function DashboardPage() {
                   <PlayCircle className="size-4" aria-hidden="true" />
                   Resume
                 </Link>
-              </Card>
-            ))}
-          </div>
-        </section>
-      </div>
+              </GlassCard>
+            </Reveal>
+          ))}
+        </div>
+      </section>
 
-      {/* Recommended + certificates */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recommended next */}
-        <section className="space-y-4">
-          <h2 className="text-lg font-bold text-navy">Recommended next</h2>
-          <Card className="flex h-full flex-col bg-gradient-to-br from-brand-700 to-brand-900 text-white">
-            <div className="flex items-start justify-between gap-3">
-              <span className="grid size-12 place-items-center rounded-xl bg-white/15 text-white">
-                <Icon name={recommended.icon} className="size-6" />
-              </span>
-              <Badge tone="accent">{recommended.level}</Badge>
-            </div>
-            <h3 className="mt-5 text-xl font-bold">{recommended.title}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-100">
-              {recommended.subtitle}
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-brand-100">
-              <span className="inline-flex items-center gap-1.5">
-                <Clock className="size-4" aria-hidden="true" />
-                {recommended.durationHours} hrs
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Award className="size-4" aria-hidden="true" />
-                {recommended.cpdHours} CPD hrs
-              </span>
-            </div>
-            <Link
-              href={`/courses/${recommended.slug}`}
-              className={buttonVariants({
-                variant: "white",
-                size: "md",
-                className: "mt-6 self-start",
-              })}
-            >
-              Start course
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Card>
-        </section>
-
-        {/* Certificates */}
-        <section className="space-y-4">
-          <h2 className="text-lg font-bold text-navy">Your certificates</h2>
-          <div className="space-y-3">
-            {certificates.map((cert) => (
-              <Card
-                key={cert.id}
-                className="flex items-center gap-4 p-5"
-              >
-                <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-100 text-accent-700">
-                  <Award className="size-6" aria-hidden="true" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-bold text-navy">{cert.title}</h3>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    {cert.cpdHours} CPD hrs · {cert.date}
-                  </p>
-                  <p className="mt-0.5 font-mono text-xs text-slate-400">
-                    {cert.id}
-                  </p>
-                </div>
-                <Link
-                  href={`/verify/${cert.id}`}
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "sm",
-                    className: "shrink-0",
-                  })}
-                >
-                  View
-                </Link>
-              </Card>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      {/* Career pathway tracker */}
-      <section className="space-y-4">
+      {/* Certification journey */}
+      <section className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-navy">Career pathway</h2>
+            <h2 className="text-xl font-bold text-navy">Certification journey</h2>
             <p className="mt-1 text-sm text-slate-500">
               {COMPLETED_STEPS} of {pathway.length} steps complete — next up:{" "}
               <span className="font-semibold text-navy">
@@ -286,61 +210,142 @@ export default function DashboardPage() {
           </Badge>
         </div>
 
-        <Card className="overflow-x-auto">
-          <ol className="flex min-w-max gap-2 sm:min-w-0 sm:justify-between">
-            {pathway.map((step, i) => {
-              const done = i < COMPLETED_STEPS;
-              const current = i === COMPLETED_STEPS;
-              return (
-                <li
-                  key={step.label}
-                  className="flex w-28 flex-col items-center text-center"
-                >
-                  <span
-                    className={cn(
-                      "relative grid size-12 place-items-center rounded-xl ring-1 transition-colors",
-                      done
-                        ? "bg-accent-500 text-white ring-accent-500"
-                        : current
-                          ? "bg-brand-600 text-white ring-brand-600"
-                          : "bg-slate-50 text-slate-400 ring-slate-200",
-                    )}
-                  >
-                    {done ? (
-                      <CircleCheckBig className="size-6" aria-hidden="true" />
-                    ) : (
-                      <Icon name={step.icon} className="size-6" />
-                    )}
-                    <span
-                      className={cn(
-                        "absolute -right-2 -top-2 grid size-5 place-items-center rounded-full text-[10px] font-bold text-white",
-                        done
-                          ? "bg-accent-600"
-                          : current
-                            ? "bg-brand-700"
-                            : "bg-slate-300",
-                      )}
-                    >
-                      {i + 1}
-                    </span>
-                  </span>
-                  <h3
-                    className={cn(
-                      "mt-3 text-sm font-bold",
-                      done || current ? "text-navy" : "text-slate-400",
-                    )}
-                  >
-                    {step.label}
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {current ? "In progress" : step.description}
-                  </p>
-                </li>
-              );
-            })}
-          </ol>
-        </Card>
+        <GlassCard className="overflow-x-auto p-7">
+          <div className="min-w-[640px] lg:min-w-0">
+            <CertificationJourney completedSteps={COMPLETED_STEPS} />
+          </div>
+        </GlassCard>
       </section>
+
+      {/* Your certificates */}
+      <section className="space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-navy">Your certificates</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              CPD-recognised and publicly verifiable
+            </p>
+          </div>
+          <Link
+            href="/verify/EXS-2026-000184"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700"
+          >
+            Verify a certificate
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {certificates.map((cert, i) => (
+            <Reveal key={cert.id} delay={i * 0.06}>
+              <GlassCard className="flex h-full flex-col gap-4 p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-glow">
+                    <Award className="size-6" aria-hidden="true" />
+                  </span>
+                  <Badge tone="accent">{cert.cpdHours} CPD hrs</Badge>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg font-bold text-navy">{cert.title}</h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Issued {cert.date}
+                  </p>
+                  <p className="mt-2 font-mono text-xs text-slate-400">
+                    {cert.id}
+                  </p>
+                </div>
+                <Link
+                  href={`/verify/${cert.id}`}
+                  className={buttonVariants({
+                    variant: "outline",
+                    size: "sm",
+                    className: "self-start",
+                  })}
+                >
+                  View certificate
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </GlassCard>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/** Hero panel: large Talent Score ring with a growth indicator + supporting copy. */
+function TalentScorePanel() {
+  return (
+    <GlassCard className="relative h-full overflow-hidden p-7 sm:p-8">
+      <div className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-brand-500/10 blur-3xl" />
+      <div className="relative flex flex-col items-center gap-7 sm:flex-row sm:items-center sm:gap-8">
+        <ProgressRing
+          value={TALENT_SCORE}
+          size={150}
+          stroke={12}
+          ringClassName="text-brand-600"
+        >
+          <span className="flex items-baseline">
+            <span className="text-display font-extrabold leading-none text-navy">
+              <AnimatedCounter value={TALENT_SCORE} />
+            </span>
+            <span className="ml-0.5 font-display text-lg font-bold text-slate-400">
+              /100
+            </span>
+          </span>
+        </ProgressRing>
+
+        <div className="min-w-0 text-center sm:text-left">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-600">
+            Talent Score
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-extrabold text-navy">
+            Sofia Ahmed
+          </h2>
+          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent-100 px-3 py-1 text-sm font-semibold text-accent-700">
+            <TrendingUp className="size-4" aria-hidden="true" />
+            +12 this month
+          </span>
+          <p className="mt-4 text-sm leading-relaxed text-slate-600">
+            Your live employability score, assessed across courses,
+            communication and role-play.
+          </p>
+        </div>
+      </div>
+    </GlassCard>
+  );
+}
+
+type BarTone = "brand" | "accent" | "violet";
+
+const barTones: Record<BarTone, string> = {
+  brand: "bg-brand-500",
+  accent: "bg-accent-500",
+  violet: "bg-violet-500",
+};
+
+function ProgressBar({
+  value,
+  tone,
+  className,
+}: {
+  value: number;
+  tone: BarTone;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`h-2 overflow-hidden rounded-full bg-slate-100 ${className ?? ""}`}
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <div
+        className={`h-full rounded-full ${barTones[tone]}`}
+        style={{ width: `${value}%` }}
+      />
     </div>
   );
 }

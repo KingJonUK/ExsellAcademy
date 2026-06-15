@@ -1,8 +1,11 @@
+import { ProgressRing as SharedProgressRing } from "@/components/ui/progress-ring";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { cn } from "@/lib/utils";
 
 /**
- * Circular progress ring, mirroring the hero ScoreRing approach with an
- * inline SVG. Size scales the SVG box; value (0–100) drives the arc.
+ * Dashboard progress ring — a thin wrapper around the shared
+ * `@/components/ui/progress-ring` so there is a single ring implementation.
+ * Renders an animated counter in the centre with an optional small label.
  */
 export function ProgressRing({
   value,
@@ -10,7 +13,7 @@ export function ProgressRing({
   strokeWidth = 6,
   label,
   className,
-  trackClassName = "text-slate-100",
+  trackClassName = "text-slate-200",
   arcClassName = "text-accent-500",
 }: {
   value: number;
@@ -22,50 +25,20 @@ export function ProgressRing({
   trackClassName?: string;
   arcClassName?: string;
 }) {
-  const clamped = Math.min(100, Math.max(0, value));
-  const center = size / 2;
-  const radius = center - strokeWidth;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (clamped / 100) * circumference;
   const valueSize = size >= 96 ? "text-2xl" : "text-sm";
 
   return (
-    <div
-      className={cn("relative grid place-items-center", className)}
-      style={{ width: size, height: size }}
+    <SharedProgressRing
+      value={value}
+      size={size}
+      stroke={strokeWidth}
+      className={className}
+      trackClassName={trackClassName}
+      ringClassName={arcClassName}
     >
-      <svg
-        className="-rotate-90"
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        aria-hidden="true"
-      >
-        <circle
-          cx={center}
-          cy={center}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          className={trackClassName}
-        />
-        <circle
-          cx={center}
-          cy={center}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          className={arcClassName}
-        />
-      </svg>
-      <span className="absolute flex flex-col items-center leading-none">
+      <span className="flex flex-col items-center leading-none">
         <span className={cn("font-display font-extrabold text-navy", valueSize)}>
-          {clamped}
+          <AnimatedCounter value={Math.min(100, Math.max(0, value))} />
         </span>
         {label ? (
           <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
@@ -73,6 +46,6 @@ export function ProgressRing({
           </span>
         ) : null}
       </span>
-    </div>
+    </SharedProgressRing>
   );
 }

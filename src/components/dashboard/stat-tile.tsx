@@ -1,16 +1,27 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { Card } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { cn } from "@/lib/utils";
 
+type Tone = "brand" | "accent" | "violet";
+
+const chipTones: Record<Tone, string> = {
+  brand: "bg-brand-50 text-brand-600 ring-1 ring-brand-100",
+  accent: "bg-accent-100 text-accent-700 ring-1 ring-accent-200",
+  violet: "bg-violet-50 text-violet-600 ring-1 ring-violet-200",
+};
+
 /**
- * Compact KPI tile for the dashboard stat row: an icon chip, a large value and
- * a supporting label. Optionally swap the icon chip for custom content (e.g. a
- * progress ring) via the `visual` slot.
+ * Premium KPI tile for the dashboard stat row: a glass panel with an icon chip
+ * (or custom `visual` slot) and a large animated value. Pass a numeric `value`
+ * to drive an `AnimatedCounter`, or a `ReactNode` for a pre-formatted value.
  */
 export function StatTile({
   icon: IconCmp,
   value,
+  suffix,
+  prefix,
   label,
   hint,
   visual,
@@ -18,39 +29,45 @@ export function StatTile({
   className,
 }: {
   icon?: LucideIcon;
-  value: ReactNode;
+  value: ReactNode | number;
+  suffix?: string;
+  prefix?: string;
   label: string;
-  hint?: string;
+  hint?: ReactNode;
   visual?: ReactNode;
-  tone?: "brand" | "accent";
+  tone?: Tone;
   className?: string;
 }) {
-  const chipTone =
-    tone === "accent"
-      ? "bg-accent-100 text-accent-700"
-      : "bg-brand-50 text-brand-600 ring-1 ring-brand-100";
-
   return (
-    <Card className={cn("flex items-center gap-4", className)}>
+    <GlassCard
+      className={cn(
+        "flex items-center gap-4 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated",
+        className,
+      )}
+    >
       {visual ? (
         <div className="shrink-0">{visual}</div>
       ) : IconCmp ? (
         <span
           className={cn(
-            "grid size-12 shrink-0 place-items-center rounded-xl",
-            chipTone,
+            "grid size-12 shrink-0 place-items-center rounded-2xl",
+            chipTones[tone],
           )}
         >
           <IconCmp className="size-6" aria-hidden="true" />
         </span>
       ) : null}
       <div className="min-w-0">
-        <p className="font-display text-2xl font-extrabold leading-tight text-navy">
-          {value}
+        <p className="font-display text-3xl font-extrabold leading-none text-navy">
+          {typeof value === "number" ? (
+            <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
+          ) : (
+            value
+          )}
         </p>
-        <p className="text-sm font-medium text-slate-500">{label}</p>
-        {hint ? <p className="mt-0.5 text-xs text-slate-400">{hint}</p> : null}
+        <p className="mt-1.5 text-sm font-semibold text-slate-500">{label}</p>
+        {hint ? <p className="mt-1 text-xs font-medium text-slate-400">{hint}</p> : null}
       </div>
-    </Card>
+    </GlassCard>
   );
 }
