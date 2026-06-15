@@ -15,11 +15,23 @@ export function Section({
   );
 }
 
-export function Eyebrow({ className, ...props }: ComponentProps<"p">) {
+const eyebrowTones = {
+  brand: "text-brand-600",
+  light: "text-brand-300",
+  accent: "text-accent-600",
+  violet: "text-violet-600",
+} as const;
+
+export function Eyebrow({
+  className,
+  tone = "brand",
+  ...props
+}: ComponentProps<"p"> & { tone?: keyof typeof eyebrowTones }) {
   return (
     <p
       className={cn(
-        "mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-brand-600",
+        "mb-3 text-sm font-semibold uppercase tracking-[0.18em]",
+        eyebrowTones[tone],
         className,
       )}
       {...props}
@@ -30,12 +42,14 @@ export function Eyebrow({ className, ...props }: ComponentProps<"p">) {
 /** Heading block: optional eyebrow, title and supporting description. */
 export function SectionHeading({
   eyebrow,
+  eyebrowTone,
   title,
   description,
   align = "center",
   className,
 }: {
   eyebrow?: string;
+  eyebrowTone?: keyof typeof eyebrowTones;
   title: ReactNode;
   description?: ReactNode;
   align?: "center" | "left";
@@ -49,8 +63,8 @@ export function SectionHeading({
         className,
       )}
     >
-      {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-      <h2 className="text-3xl font-bold text-navy sm:text-4xl">{title}</h2>
+      {eyebrow ? <Eyebrow tone={eyebrowTone}>{eyebrow}</Eyebrow> : null}
+      <h2 className="text-display text-navy">{title}</h2>
       {description ? (
         <p className="mt-4 text-lg leading-relaxed text-slate-600">{description}</p>
       ) : null}
