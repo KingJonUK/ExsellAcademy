@@ -1,0 +1,589 @@
+// ExSell Academy — platform data model
+// One ecosystem, three engines: Academy (learning), Foundation (funded
+// applications) and the Talent Network (recruitment & placements).
+//
+// This schema is the target data model for the platform. The MVP UI currently
+// reads authored content from src/lib/data; later phases connect these models
+// via the Prisma client. Run `npm run db:push` against a Postgres database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  PUBLIC
+  LEARNER
+  EMPLOYER
+  SPONSOR
+  ADMIN
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CourseAccess {
+  FREE
+  PAID
+  FUNDED
+}
+
+enum CourseCategory {
+  FOUNDATIONS
+  COMMUNICATION
+  PROSPECTING
+  CLOSING
+  TECHNOLOGY
+  CAREER
+}
+
+enum LessonType {
+  VIDEO
+  READING
+  EXERCISE
+  QUIZ
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  SCENARIO
+  WRITTEN
+  VIDEO_ROLEPLAY
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  PASSED
+  FAILED
+  PENDING_REVIEW
+}
+
+enum CertificateStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  MORE_INFO_REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum WorkMode {
+  REMOTE
+  HYBRID
+  ONSITE
+}
+
+enum JobStatus {
+  OPEN
+  PAUSED
+  CLOSED
+}
+
+enum PipelineStage {
+  SUBMITTED
+  INTERVIEW_REQUESTED
+  INTERVIEW_BOOKED
+  OFFER_MADE
+  OFFER_ACCEPTED
+  STARTED
+  REJECTED
+}
+
+enum PlacementStatus {
+  PENDING
+  STARTED
+  FEE_DUE
+  FEE_PAID
+  COMPLETED
+  FELL_THROUGH
+}
+
+enum PaymentType {
+  COURSE_PURCHASE
+  SUBSCRIPTION
+  EMPLOYER_ACCESS
+  PLACEMENT_FEE
+  DONATION
+  SPONSORSHIP
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum SponsorshipStatus {
+  PLEDGED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+// ---------------------------------------------------------------------------
+// Identity & profiles
+// ---------------------------------------------------------------------------
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  role      UserRole @default(LEARNER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  learnerProfile  LearnerProfile?
+  employerProfile EmployerProfile?
+  sponsorProfile  SponsorProfile?
+
+  applications         Application[] @relation("Applicant")
+  reviewedApplications Application[] @relation("ApplicationReviewer")
+  reviewedAttempts     QuizAttempt[] @relation("AttemptReviewer")
+  payments             Payment[]
+  auditLogs            AuditLog[]
+
+  @@map("users")
+}
+
+model LearnerProfile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone                String?
+  dateOfBirth          DateTime?
+  location             String?
+  bio                  String?
+  preferredIndustries  String[]
+  desiredSalaryPennies Int?
+  workMode             WorkMode?
+  availability         String?
+  videoIntroUrl        String?
+  cvUrl                String?
+  // Composite 0-100 talent readiness score; only pooled learners are visible.
+  talentReadinessScore Int?
+  inTalentPool         Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  enrollments    Enrollment[]
+  lessonProgress LessonProgress[]
+  quizAttempts   QuizAttempt[]
+  certificates   Certificate[]
+  pipeline       CandidatePipeline[]
+  placements     Placement[]
+  sponsorships   Sponsorship[]
+
+  @@map("learner_profiles")
+}
+
+model EmployerProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName     String
+  website         String?
+  logoUrl         String?
+  industry        String?
+  location        String?
+  about           String?
+  hiringCriteria  String?
+  verified        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  jobs       Job[]
+  pipeline   CandidatePipeline[]
+  placements Placement[]
+
+  @@map("employer_profiles")
+}
+
+model SponsorProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organisation String
+  type         String?
+  website      String?
+  logoUrl      String?
+  about        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sponsorships         Sponsorship[]
+  donations            Donation[]
+  assignedApplications Application[] @relation("AssignedSponsor")
+
+  @@map("sponsor_profiles")
+}
+
+// ---------------------------------------------------------------------------
+// Learning: courses, modules, lessons, progress
+// ---------------------------------------------------------------------------
+
+model Course {
+  id              String         @id @default(cuid())
+  slug            String         @unique
+  title           String
+  subtitle        String
+  description     String
+  category        CourseCategory
+  level           CourseLevel
+  access          CourseAccess
+  pricePennies    Int?
+  durationMinutes Int            @default(0)
+  cpdHours        Int            @default(0)
+  certificate     Boolean        @default(true)
+  icon            String?
+  published       Boolean        @default(false)
+  order           Int            @default(0)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  modules      Module[]
+  enrollments  Enrollment[]
+  quizzes      Quiz[]
+  certificates Certificate[]
+  applications Application[] @relation("AssignedCourse")
+
+  @@map("courses")
+}
+
+model Module {
+  id       String  @id @default(cuid())
+  courseId String
+  course   Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title    String
+  order    Int     @default(0)
+
+  lessons Lesson[]
+  quizzes Quiz[]
+
+  @@map("modules")
+}
+
+model Lesson {
+  id              String     @id @default(cuid())
+  moduleId        String
+  module          Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title           String
+  type            LessonType @default(VIDEO)
+  contentUrl      String?
+  body            String?
+  durationMinutes Int        @default(0)
+  order           Int        @default(0)
+
+  progress LessonProgress[]
+  quiz     Quiz?
+
+  @@map("lessons")
+}
+
+model Enrollment {
+  id          String         @id @default(cuid())
+  learnerId   String
+  learner     LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status      ProgressStatus @default(NOT_STARTED)
+  progressPct Int            @default(0)
+  funded      Boolean        @default(false)
+  enrolledAt  DateTime       @default(now())
+  completedAt DateTime?
+
+  @@unique([learnerId, courseId])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id             String         @id @default(cuid())
+  learnerId      String
+  learner        LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  lessonId       String
+  lesson         Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status         ProgressStatus @default(NOT_STARTED)
+  secondsWatched Int            @default(0)
+  completedAt    DateTime?
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([learnerId, lessonId])
+  @@map("lesson_progress")
+}
+
+// ---------------------------------------------------------------------------
+// Assessment: quizzes, questions, attempts
+// ---------------------------------------------------------------------------
+
+model Quiz {
+  id                String  @id @default(cuid())
+  courseId          String
+  course            Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  moduleId          String?
+  module            Module? @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  lessonId          String? @unique
+  lesson            Lesson? @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  title             String
+  passMark          Int     @default(80)
+  isFinalAssessment Boolean @default(false)
+
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id            String       @id @default(cuid())
+  quizId        String
+  quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  type          QuestionType @default(MULTIPLE_CHOICE)
+  prompt        String
+  options       Json?
+  correctAnswer Json?
+  points        Int          @default(1)
+  order         Int          @default(0)
+
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id           String         @id @default(cuid())
+  quizId       String
+  quiz         Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  learnerId    String
+  learner      LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  status       AttemptStatus  @default(IN_PROGRESS)
+  score        Int?
+  answers      Json?
+  startedAt    DateTime       @default(now())
+  submittedAt  DateTime?
+  reviewedById String?
+  reviewedBy   User?          @relation("AttemptReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNotes  String?
+
+  @@map("quiz_attempts")
+}
+
+// ---------------------------------------------------------------------------
+// Certification
+// ---------------------------------------------------------------------------
+
+model Certificate {
+  id             String            @id @default(cuid())
+  // Public id, e.g. EXS-2026-000184
+  certificateId  String            @unique
+  learnerId      String
+  learner        LearnerProfile    @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  courseId       String
+  course         Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title          String
+  cpdHours       Int
+  status         CertificateStatus @default(ACTIVE)
+  issuedAt       DateTime          @default(now())
+  completionDate DateTime
+  pdfUrl         String?
+
+  @@map("certificates")
+}
+
+// ---------------------------------------------------------------------------
+// Foundation: funded applications
+// ---------------------------------------------------------------------------
+
+model Application {
+  id                String            @id @default(cuid())
+  applicantUserId   String?
+  applicant         User?             @relation("Applicant", fields: [applicantUserId], references: [id], onDelete: SetNull)
+  fullName          String
+  email             String
+  phone             String?
+  age               Int?
+  location          String?
+  educationStatus   String?
+  employmentStatus  String?
+  careerGoals       String?
+  whySales          String?
+  availability      String?
+  consent           Boolean           @default(false)
+  safeguardingNotes String?
+  status            ApplicationStatus @default(SUBMITTED)
+
+  assignedCourseId  String?
+  assignedCourse    Course?         @relation("AssignedCourse", fields: [assignedCourseId], references: [id], onDelete: SetNull)
+  assignedSponsorId String?
+  assignedSponsor   SponsorProfile? @relation("AssignedSponsor", fields: [assignedSponsorId], references: [id], onDelete: SetNull)
+
+  reviewedById String?
+  reviewedBy   User?   @relation("ApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNotes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("applications")
+}
+
+// ---------------------------------------------------------------------------
+// Talent Network: jobs, pipeline, placements
+// ---------------------------------------------------------------------------
+
+model Job {
+  id               String    @id @default(cuid())
+  employerId       String
+  employer         EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  workMode         WorkMode  @default(HYBRID)
+  location         String?
+  industry         String?
+  salaryMinPennies Int?
+  salaryMaxPennies Int?
+  minReadinessScore Int?
+  status           JobStatus @default(OPEN)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  pipeline   CandidatePipeline[]
+  placements Placement[]
+
+  @@map("jobs")
+}
+
+model CandidatePipeline {
+  id         String         @id @default(cuid())
+  employerId String
+  employer   EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  learnerId  String
+  learner    LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  jobId      String?
+  job        Job?           @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  stage      PipelineStage  @default(SUBMITTED)
+  notes      String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  placement Placement?
+
+  @@unique([employerId, learnerId, jobId])
+  @@map("candidate_pipeline")
+}
+
+model Placement {
+  id           String          @id @default(cuid())
+  learnerId    String
+  learner      LearnerProfile  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  employerId   String
+  employer     EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  jobId        String?
+  job          Job?            @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  pipelineId   String?         @unique
+  pipeline     CandidatePipeline? @relation(fields: [pipelineId], references: [id], onDelete: SetNull)
+  status       PlacementStatus @default(PENDING)
+  startDate    DateTime?
+  feePennies   Int?
+  feeStatus    PaymentStatus   @default(PENDING)
+  check30      DateTime?
+  check60      DateTime?
+  check90      DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  payments Payment[]
+
+  @@map("placements")
+}
+
+// ---------------------------------------------------------------------------
+// Commerce: payments, donations, sponsorships
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id                    String        @id @default(cuid())
+  userId                String?
+  user                  User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type                  PaymentType
+  amountPennies         Int
+  currency              String        @default("GBP")
+  status                PaymentStatus @default(PENDING)
+  stripePaymentIntentId String?
+  placementId           String?
+  placement             Placement?    @relation(fields: [placementId], references: [id], onDelete: SetNull)
+  createdAt             DateTime      @default(now())
+
+  @@map("payments")
+}
+
+model Donation {
+  id            String         @id @default(cuid())
+  sponsorId     String?
+  sponsor       SponsorProfile? @relation(fields: [sponsorId], references: [id], onDelete: SetNull)
+  donorName     String?
+  donorEmail    String?
+  amountPennies Int
+  currency      String         @default("GBP")
+  status        PaymentStatus  @default(PENDING)
+  message       String?
+  createdAt     DateTime       @default(now())
+
+  @@map("donations")
+}
+
+model Sponsorship {
+  id            String            @id @default(cuid())
+  sponsorId     String
+  sponsor       SponsorProfile    @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  packageName   String
+  amountPennies Int
+  currency      String            @default("GBP")
+  cohort        String?
+  learnerId     String?
+  learner       LearnerProfile?   @relation(fields: [learnerId], references: [id], onDelete: SetNull)
+  status        SponsorshipStatus @default(PLEDGED)
+  startedAt     DateTime          @default(now())
+
+  @@map("sponsorships")
+}
+
+// ---------------------------------------------------------------------------
+// Admin: audit logs
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actor       User?    @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  action      String
+  entity      String
+  entityId    String?
+  metadata    Json?
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
