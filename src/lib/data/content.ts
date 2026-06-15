@@ -86,11 +86,16 @@ export const pathway: PathwayStep[] = [
  * Honest, pre-launch metrics. We deliberately do not invent public numbers;
  * these describe the model until real outcome data exists.
  */
-export const impactStats: { value: string; label: string; note?: string }[] = [
-  { value: "8", label: "Career-focused courses", note: "Foundations to interview-ready" },
-  { value: "40+", label: "CPD hours available", note: "Across the full pathway" },
-  { value: "100%", label: "Certified on completion", note: "Meet the criteria, earn the certificate" },
-  { value: "3", label: "Connected products", note: "Academy, Foundation, Talent Network" },
+export const impactStats: {
+  value: number;
+  suffix?: string;
+  label: string;
+  note?: string;
+}[] = [
+  { value: 8, label: "Career-focused courses", note: "Foundations to interview-ready" },
+  { value: 44, label: "CPD hours available", note: "Across the full pathway" },
+  { value: 100, suffix: "%", label: "Certified on completion", note: "Meet the criteria, earn the certificate" },
+  { value: 3, label: "Connected products", note: "Academy, Foundation, Talent Network" },
 ];
 
 export const employerBenefits: IconItem[] = [
