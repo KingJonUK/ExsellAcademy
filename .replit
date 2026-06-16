@@ -1,0 +1,21 @@
+modules = ["nodejs-22"]
+run = "npm run dev"
+entrypoint = "README.md"
+hidden = [".config", ".next", "node_modules", "package-lock.json"]
+
+[nix]
+channel = "stable-24_11"
+
+[env]
+NEXT_TELEMETRY_DISABLED = "1"
+
+# Workspace dev server: Next.js listens on 3000, exposed on the web preview as 80.
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+# Production deployment (Replit Autoscale). `next start` honours $PORT and binds 0.0.0.0.
+[deployment]
+deploymentTarget = "cloudrun"
+build = ["npm", "run", "build"]
+run = ["npm", "run", "start"]

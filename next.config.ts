@@ -12,6 +12,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Allow the Replit workspace proxy domains to reach the dev server — Next 16
+  // blocks cross-origin dev requests (HMR/assets) by default.
+  allowedDevOrigins: ["*.replit.dev", "*.repl.co"],
   images: {
     formats: ["image/avif", "image/webp"],
   },
