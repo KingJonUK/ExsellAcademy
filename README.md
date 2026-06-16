@@ -52,7 +52,7 @@ npm run dev               # http://localhost:3000
 
 ## Deployment — Replit
 
-This app is configured to run and deploy on **Replit** (Vercel is not configured for now).
+This app is configured to run and deploy on **Replit**.
 
 The repo ships a `.replit` (Node 22, port 3000 → 80, Autoscale deployment) and a `replit.nix` (OpenSSL for Prisma). To run it on Replit:
 
@@ -68,8 +68,6 @@ The repo ships a `.replit` (Node 22, port 3000 → 80, Autoscale deployment) and
    ```
 5. **Develop** — click **Run**. The dev server is served on the workspace URL (`*.replit.dev`, already allow-listed via `allowedDevOrigins` in `next.config.ts`).
 6. **Deploy** — click **Deploy → Autoscale** (build `npm run build`, run `npm run start`). Add the same Secrets to the deployment, then attach a custom domain if desired.
-
-> **Vercel:** intentionally not configured for now. The previous `.vercel` ignore entry has been removed — re-add Vercel config later if you want both targets.
 
 ---
 
