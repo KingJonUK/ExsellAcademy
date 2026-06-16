@@ -4,7 +4,7 @@
     "position": 1,
     "filepath": "src/pages/slides/Slide1Title.tsx",
     "title": "ExSell Academy",
-    "description": "Title slide — platform architecture overview with tech stack pills",
+    "description": "Homepage hero — brand identity, headline, talent readiness widget",
     "speakerNotes": ""
   },
   {
@@ -12,39 +12,39 @@
     "position": 2,
     "filepath": "src/pages/slides/Slide2PlatformOverview.tsx",
     "title": "Platform Overview",
-    "description": "Client-side SPA — Vite, Wouter, TanStack Query, Tailwind + Radix UI",
+    "description": "Three audiences — Learners, Employers, Sponsors",
     "speakerNotes": ""
   },
   {
     "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
     "position": 3,
     "filepath": "src/pages/slides/Slide3Auth.tsx",
-    "title": "Authentication & Role Model",
-    "description": "Three-role password gate — Learner, Admin, Employer",
+    "title": "Signing In",
+    "description": "Login screen — split-panel design with demo access callout",
     "speakerNotes": ""
   },
   {
     "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
     "position": 4,
     "filepath": "src/pages/slides/Slide4DataArchitecture.tsx",
-    "title": "Data Architecture",
-    "description": "Static demo stores replacing Prisma/PostgreSQL — API-ready shapes",
+    "title": "Course Catalogue",
+    "description": "CPD-accredited courses — Sales Foundations, Prospecting, Interview Readiness",
     "speakerNotes": ""
   },
   {
     "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
     "position": 5,
     "filepath": "src/pages/slides/Slide5Migration.tsx",
-    "title": "Next.js to Vite Migration",
-    "description": "Bespoke shim layer — next/link, next/image, next/navigation, next/font",
+    "title": "Learner Dashboard",
+    "description": "Talent readiness score, certification journey, progress tracking",
     "speakerNotes": ""
   },
   {
     "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
     "position": 6,
     "filepath": "src/pages/slides/Slide6WhatsNext.tsx",
-    "title": "What's Next",
-    "description": "Three next steps — mobile app, promo video, investor pitch deck",
+    "title": "Employer Portal",
+    "description": "Talent pipeline, candidate cards, placement tracking",
     "speakerNotes": ""
   }
 ]
