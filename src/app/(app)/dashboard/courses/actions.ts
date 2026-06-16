@@ -20,6 +20,12 @@ export async function markLessonComplete(formData: FormData) {
   const courseSlug = String(formData.get("courseSlug") ?? "");
   if (!lessonId || !courseId) return;
 
+  // Enforce enrollment server-side (the action can be POSTed to directly).
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { learnerId_courseId: { learnerId: learner.id, courseId } },
+  });
+  if (!enrollment) return;
+
   // Upsert LessonProgress → COMPLETED.
   await prisma.lessonProgress.upsert({
     where: { learnerId_lessonId: { learnerId: learner.id, lessonId } },
@@ -47,13 +53,59 @@ export async function markLessonComplete(formData: FormData) {
   const progressPct =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
+  // A course completes via its final-assessment quiz when it has one; otherwise
+  // finishing every lesson is what completes it. Without this, lesson-only
+  // courses sit at 100% but never flip to COMPLETED.
+  const hasFinalQuiz =
+    progressPct === 100
+      ? (await prisma.quiz.count({
+          where: { courseId, isFinalAssessment: true },
+        })) > 0
+      : true;
+  const fullyComplete = progressPct === 100 && !hasFinalQuiz;
+
   await prisma.enrollment.updateMany({
     where: { learnerId: learner.id, courseId },
     data: {
       progressPct,
-      status: progressPct > 0 ? "IN_PROGRESS" : "NOT_STARTED",
+      status: fullyComplete
+        ? "COMPLETED"
+        : progressPct > 0
+          ? "IN_PROGRESS"
+          : "NOT_STARTED",
+      ...(fullyComplete ? { completedAt: new Date() } : {}),
     },
   });
+
+  // Issue the certificate when a quiz-less course is fully completed (mirrors
+  // the final-assessment path in submitQuiz).
+  if (fullyComplete) {
+    const course = await prisma.course.findUnique({
+      where: { id: courseId },
+      select: { certificate: true, title: true, cpdHours: true },
+    });
+    if (course?.certificate) {
+      const existingCert = await prisma.certificate.findFirst({
+        where: { learnerId: learner.id, courseId },
+      });
+      if (!existingCert) {
+        const certCount = await prisma.certificate.count();
+        await prisma.certificate.create({
+          data: {
+            certificateId: certificateId(new Date().getFullYear(), 2000 + certCount),
+            learnerId: learner.id,
+            courseId,
+            title: course.title,
+            cpdHours: course.cpdHours,
+            completionDate: new Date(),
+            status: "ACTIVE",
+          },
+        });
+      }
+    }
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/certificates");
+  }
 
   revalidatePath(`/dashboard/courses/${courseSlug}`);
   revalidatePath(`/dashboard/courses`);
@@ -103,6 +155,16 @@ export async function submitQuiz(formData: FormData) {
     },
   });
   if (!quiz) return;
+
+  // Enforce enrollment server-side: hiding the form on the page is not enough,
+  // since this action can be POSTed to directly. No enrollment → no grading,
+  // no certificate.
+  const enrollment = await prisma.enrollment.findUnique({
+    where: {
+      learnerId_courseId: { learnerId: learner.id, courseId: quiz.courseId },
+    },
+  });
+  if (!enrollment) redirect(`/dashboard/courses/${courseSlug}`);
 
   // Grade the attempt.
   let score = 0;

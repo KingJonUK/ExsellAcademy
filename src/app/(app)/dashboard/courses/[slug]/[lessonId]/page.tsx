@@ -71,7 +71,8 @@ export default async function LessonPlayerPage({
     redirect(`/dashboard/courses/${slug}/quiz/${lesson.quiz.id}`);
   }
 
-  // Verify enrollment.
+  // Enforce enrollment before exposing lesson content. Unenrolled learners are
+  // sent to the course overview, which presents the enrolment options.
   const enrollment = await prisma.enrollment.findUnique({
     where: {
       learnerId_courseId: {
@@ -80,6 +81,7 @@ export default async function LessonPlayerPage({
       },
     },
   });
+  if (!enrollment) redirect(`/dashboard/courses/${slug}`);
 
   // Fetch all lessons for sidebar + prev/next.
   const allModules = await prisma.module.findMany({

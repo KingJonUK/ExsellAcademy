@@ -27,10 +27,14 @@ export async function generateMetadata({
 
 export default async function QuizPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string; quizId: string }>;
+  searchParams: Promise<{ retry?: string }>;
 }) {
   const { slug, quizId } = await params;
+  const { retry } = await searchParams;
+  const isRetry = retry === "1";
   const learner = await getSessionLearner();
   if (!learner) redirect("/login");
 
@@ -59,7 +63,9 @@ export default async function QuizPage({
 
   const passed = lastAttempt?.status === "PASSED";
   const failed = lastAttempt?.status === "FAILED";
-  const hasResult = passed || failed;
+  // A pass is terminal. A failure shows the result by default, but a "Try again"
+  // (?retry=1) re-renders the form so the learner can re-attempt.
+  const showResult = passed || (failed && !isRetry);
 
   // Certificate (if passed and final assessment).
   const certificate = passed && quiz.isFinalAssessment
@@ -120,7 +126,7 @@ export default async function QuizPage({
         </div>
 
         {/* Result screen */}
-        {hasResult ? (
+        {showResult ? (
           <div className="space-y-6">
             <div className="flex flex-col items-center gap-5 rounded-2xl border border-slate-100 bg-slate-50/60 py-10 text-center">
               <ProgressRing
@@ -166,17 +172,13 @@ export default async function QuizPage({
 
             <div className="flex flex-wrap justify-center gap-3">
               {!passed && enrollment ? (
-                <form>
-                  <input type="hidden" name="quizId" value={quizId} />
-                  <input type="hidden" name="courseSlug" value={slug} />
-                  <Link
-                    href={`/dashboard/courses/${slug}/quiz/${quizId}`}
-                    className={buttonVariants({ variant: "primary", size: "md" })}
-                  >
-                    <RefreshCw className="size-4" />
-                    Try again
-                  </Link>
-                </form>
+                <Link
+                  href={`/dashboard/courses/${slug}/quiz/${quizId}?retry=1`}
+                  className={buttonVariants({ variant: "primary", size: "md" })}
+                >
+                  <RefreshCw className="size-4" />
+                  Try again
+                </Link>
               ) : null}
 
               {certificate ? (
