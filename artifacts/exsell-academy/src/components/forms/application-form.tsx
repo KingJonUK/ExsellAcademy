@@ -28,16 +28,6 @@ import { cn } from "@/lib/utils";
  */
 type FormInput = z.input<typeof applicationSchema>;
 
-/** Generate a short random id for a client-side application reference. */
-function randomId(length: number) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let out = "";
-  for (let i = 0; i < length; i++) {
-    out += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return out;
-}
-
 const steps = [
   { title: "About you", description: "The basics so we can get in touch." },
   { title: "Your goals", description: "Tell us where you want to go." },
@@ -80,12 +70,23 @@ export function ApplicationForm() {
   }
 
   const onSubmit = handleSubmit(async (values) => {
-    void values;
     setSubmit({ status: "submitting" });
-    // No backend — simulate success on the client.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    const reference = `EXS-APP-${randomId(8).toUpperCase()}`;
-    setSubmit({ status: "success", reference });
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}api/applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const json = (await res.json()) as { ok: boolean; reference?: string; errors?: Record<string, string[]> };
+      if (json.ok && json.reference) {
+        setSubmit({ status: "success", reference: json.reference });
+      } else {
+        const msg = json.errors?._form?.[0] ?? "Something went wrong. Please try again.";
+        setSubmit({ status: "error", message: msg });
+      }
+    } catch {
+      setSubmit({ status: "error", message: "Network error — please check your connection and try again." });
+    }
   });
 
   if (submit.status === "success") {

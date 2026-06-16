@@ -25,12 +25,24 @@ export function ContactForm() {
   });
 
   async function onSubmit(values: ContactInput) {
-    void values;
     setSubmitError(null);
-    // No backend — simulate success on the client.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    reset();
-    setSubmitted(true);
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const json = (await res.json()) as { ok: boolean; errors?: Record<string, string[]> };
+      if (json.ok) {
+        reset();
+        setSubmitted(true);
+      } else {
+        const msg = json.errors?._form?.[0] ?? "Something went wrong. Please try again.";
+        setSubmitError(msg);
+      }
+    } catch {
+      setSubmitError("Network error — please check your connection and try again.");
+    }
   }
 
   if (submitted) {
