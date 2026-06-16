@@ -34,8 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
-# vercel
-.vercel
+# replit
+.config/
+.upm/
+.cache/
 
 # typescript
 *.tsbuildinfo
