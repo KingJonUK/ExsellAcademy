@@ -25,6 +25,14 @@ function gateFor(pathname: string): Gate {
       home: "/employer",
     };
   }
+  if (pathname.startsWith("/dashboard") || pathname === "/login") {
+    return {
+      cookie: "exsell_learner",
+      token: tokenFor("exsell-learner", process.env.LEARNER_PASSWORD, "exsell-learner"),
+      login: "/login",
+      home: "/dashboard",
+    };
+  }
   return {
     cookie: "exsell_admin",
     token: tokenFor("exsell", process.env.ADMIN_PASSWORD, "exsell-admin"),
@@ -58,5 +66,13 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*", "/employer", "/employer/:path*"],
+  matcher: [
+    "/admin",
+    "/admin/:path*",
+    "/employer",
+    "/employer/:path*",
+    "/dashboard",
+    "/dashboard/:path*",
+    "/login",
+  ],
 };

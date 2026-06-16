@@ -505,11 +505,260 @@ async function seedEmployerAndTalent() {
   }
 }
 
+async function seedLearnerLMS() {
+  const sofia = await prisma.learnerProfile.findFirst({
+    where: { user: { email: "sofia.ahmed@talent.example.com" } },
+  });
+  if (!sofia) {
+    console.log("Demo learner not found — skipping LMS seed.");
+    return;
+  }
+
+  // Guard: skip if Sofia already has enrollments.
+  const existingCount = await prisma.enrollment.count({ where: { learnerId: sofia.id } });
+  if (existingCount > 0) {
+    console.log("Learner enrollments already present — skipping LMS seed.");
+    return;
+  }
+
+  const [prospecting, aiForSales, interviewReadiness] = await Promise.all([
+    prisma.course.findUnique({ where: { slug: "prospecting-essentials" } }),
+    prisma.course.findUnique({ where: { slug: "ai-for-sales" } }),
+    prisma.course.findUnique({ where: { slug: "interview-readiness" } }),
+  ]);
+
+  // --- Enrollments ---
+  if (prospecting) {
+    await prisma.enrollment.create({
+      data: {
+        learnerId: sofia.id,
+        courseId: prospecting.id,
+        status: "IN_PROGRESS",
+        progressPct: 40,
+        funded: false,
+      },
+    });
+  }
+  if (aiForSales) {
+    await prisma.enrollment.create({
+      data: {
+        learnerId: sofia.id,
+        courseId: aiForSales.id,
+        status: "IN_PROGRESS",
+        progressPct: 20,
+        funded: false,
+      },
+    });
+  }
+  if (interviewReadiness) {
+    await prisma.enrollment.create({
+      data: {
+        learnerId: sofia.id,
+        courseId: interviewReadiness.id,
+        status: "NOT_STARTED",
+        progressPct: 0,
+        funded: false,
+      },
+    });
+  }
+
+  // --- Lesson progress + content for prospecting-essentials ---
+  if (prospecting) {
+    const modules = await prisma.module.findMany({
+      where: { courseId: prospecting.id },
+      orderBy: { order: "asc" },
+      include: { lessons: { orderBy: { order: "asc" } } },
+    });
+
+    // Add body text to key lessons so the player has content to display.
+    const contentMap: Record<string, string> = {
+      "Ideal customer profiles in plain English":
+        "An **Ideal Customer Profile (ICP)** is a description of the company (or person) that would get the most value from your product and, in turn, be most valuable to you.\n\n" +
+        "**Why it matters:** Without an ICP, you prospect at random. With one, every outreach effort is targeted at buyers who actually need what you sell.\n\n" +
+        "**Three questions to define your ICP:**\n" +
+        "1. What industry or vertical is your best-fit customer in?\n" +
+        "2. What size is their team or company?\n" +
+        "3. What pain do they feel that your product solves?\n\n" +
+        "Once you can answer those three questions, you have the foundation of a prospect list that converts.",
+
+      "Research in five minutes":
+        "Great outreach starts with great research — but most reps spend too long on it. Here is a five-minute research framework:\n\n" +
+        "**Minute 1–2: LinkedIn**\n" +
+        "- Check the prospect's current role and how long they've been in it\n" +
+        "- Look for recent posts or comments that reveal their priorities\n\n" +
+        "**Minute 3: Company news**\n" +
+        "- Search '[Company name] news 2026' — look for funding, product launches, hiring sprees or leadership changes\n\n" +
+        "**Minute 4: Their website**\n" +
+        "- What do they sell? Who are their customers?\n\n" +
+        "**Minute 5: Write one insight**\n" +
+        "- Turn your research into one personalised observation you'll use in the first line of your email.\n\n" +
+        "Five minutes. One insight. That's all you need to stand out.",
+
+      "Build your first target list":
+        "**Exercise: Build a 10-prospect target list**\n\n" +
+        "Using your ICP definition from the previous lesson, identify 10 companies that match. For each, find the name and email of the decision-maker you'd contact.\n\n" +
+        "**Tools to use:**\n" +
+        "- LinkedIn Sales Navigator (free trial available)\n" +
+        "- Apollo.io (generous free tier)\n" +
+        "- Hunter.io (email finder)\n\n" +
+        "**Template for each row:**\n" +
+        "| Company | Industry | Size | Contact | Role | LinkedIn URL | Email |\n\n" +
+        "Aim for quality over quantity. A list of 10 well-researched prospects beats a list of 100 cold names every time.",
+
+      "The first line is everything":
+        "The first line of your cold email is the only line that determines whether the rest gets read.\n\n" +
+        "**What not to write:**\n" +
+        "- 'I hope this email finds you well...'\n" +
+        "- 'My name is [X] and I work at [Y]...'\n" +
+        "- 'I wanted to reach out because...'\n\n" +
+        "**What to write instead:**\n" +
+        "Personalise it. Reference something real. Use your research.\n\n" +
+        "> 'Saw your post about scaling the BDR team — congrats on the Series B. Most teams at that stage hit a prospecting bottleneck around month 3.'\n\n" +
+        "That first line shows you did your homework. It creates curiosity. It gets the rest of the email read.",
+
+      "Tracking the metrics that matter":
+        "Most SDRs track the wrong metrics. Here's what actually moves the needle:\n\n" +
+        "**Vanity metrics (ignore):**\n" +
+        "- Number of emails sent\n" +
+        "- Open rate (unreliable since Apple MPP)\n\n" +
+        "**Signal metrics (track these):**\n" +
+        "| Metric | Target |\n" +
+        "| Reply rate | 5–10% |\n" +
+        "| Positive reply rate | 2–4% |\n" +
+        "| Meetings booked per 100 prospects | 3–5 |\n" +
+        "| Touchpoints to first reply | 4–6 |\n\n" +
+        "**Weekly review habit:**\n" +
+        "Every Friday, spend 10 minutes reviewing your numbers. Which sequence had the best reply rate? Which opening line worked? What should you test next week?\n\n" +
+        "Consistent measurement beats hoping you'll remember what worked.",
+    };
+
+    for (const mod of modules) {
+      for (const lesson of mod.lessons) {
+        if (contentMap[lesson.title]) {
+          await prisma.lesson.update({
+            where: { id: lesson.id },
+            data: { body: contentMap[lesson.title] },
+          });
+        }
+      }
+    }
+
+    // Mark the first 4 lessons as COMPLETED for Sofia.
+    const allLessons = modules.flatMap((m) => m.lessons);
+    const toComplete = allLessons.slice(0, 4);
+    for (const lesson of toComplete) {
+      await prisma.lessonProgress.create({
+        data: {
+          learnerId: sofia.id,
+          lessonId: lesson.id,
+          status: "COMPLETED",
+          completedAt: new Date("2026-06-10"),
+        },
+      });
+    }
+
+    // --- Final assessment quiz for prospecting-essentials ---
+    // Find the "Final assessment" lesson (last lesson, last module).
+    const lastModule = modules[modules.length - 1];
+    const finalLesson = lastModule?.lessons[lastModule.lessons.length - 1];
+
+    if (finalLesson && finalLesson.title.toLowerCase().includes("final")) {
+      const quiz = await prisma.quiz.create({
+        data: {
+          courseId: prospecting.id,
+          moduleId: lastModule.id,
+          lessonId: finalLesson.id,
+          title: "Prospecting Essentials: Final Assessment",
+          passMark: 80,
+          isFinalAssessment: true,
+        },
+      });
+
+      const questions: {
+        prompt: string;
+        options: string[];
+        correctIndex: number;
+      }[] = [
+        {
+          prompt: "What does ICP stand for in B2B sales?",
+          options: [
+            "Ideal Customer Profile",
+            "Internal Contact Person",
+            "Inbound Channel Process",
+            "Integrated Campaign Plan",
+          ],
+          correctIndex: 0,
+        },
+        {
+          prompt:
+            "Which of the following best describes an effective cold email opening line?",
+          options: [
+            "Start with your company name and what you do",
+            "Begin with 'I hope this email finds you well'",
+            "Reference a specific, relevant insight about the prospect",
+            "List all the features of your product upfront",
+          ],
+          correctIndex: 2,
+        },
+        {
+          prompt: "What is a 'cadence' in prospecting?",
+          options: [
+            "A single follow-up email sent after no reply",
+            "A scripted phone call introduction",
+            "A structured sequence of outreach touchpoints across channels",
+            "A type of CRM pipeline stage",
+          ],
+          correctIndex: 2,
+        },
+        {
+          prompt: "Which metric is most useful for measuring cold outreach effectiveness?",
+          options: [
+            "Email open rate",
+            "Reply rate",
+            "Number of emails sent",
+            "Bounce rate",
+          ],
+          correctIndex: 1,
+        },
+        {
+          prompt:
+            "When a prospect doesn't reply to your first outreach, you should:",
+          options: [
+            "Give up and move to the next prospect immediately",
+            "Send the exact same message again the following day",
+            "Wait indefinitely without following up",
+            "Follow up with a different angle or channel after a few days",
+          ],
+          correctIndex: 3,
+        },
+      ];
+
+      for (const [i, q] of questions.entries()) {
+        await prisma.quizQuestion.create({
+          data: {
+            quizId: quiz.id,
+            type: "MULTIPLE_CHOICE",
+            prompt: q.prompt,
+            options: q.options,
+            correctAnswer: { index: q.correctIndex },
+            points: 1,
+            order: i,
+          },
+        });
+      }
+      console.log("Seeded final assessment quiz for prospecting-essentials.");
+    }
+  }
+
+  console.log("Seeded learner LMS data (enrollments, progress, lesson content, quiz).");
+}
+
 async function main() {
   await seedCourses();
   const sponsorIds = await seedSponsors();
   await seedApplications(sponsorIds);
   await seedEmployerAndTalent();
+  await seedLearnerLMS();
 }
 
 main()
