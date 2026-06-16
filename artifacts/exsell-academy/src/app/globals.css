@@ -1,0 +1,339 @@
+@import "tailwindcss";
+
+/*
+  ExSell Academy — "Modern SaaS Luxury" design system.
+  --------------------------------------------------------------------------
+  Benchmark: Stripe / Linear / Arc / Notion / MasterClass.
+  Brand colours are used as accents on generous white space; glass panels,
+  gradient borders, depth shadows, big confident type and tasteful motion.
+  Built on Tailwind v4 tokens via @theme.
+*/
+
+@theme {
+  /* Brand blue — primary accent (#2563EB) */
+  --color-brand-50: #eff4ff;
+  --color-brand-100: #dbe6fe;
+  --color-brand-200: #bfd3fe;
+  --color-brand-300: #93b4fd;
+  --color-brand-400: #608ffa;
+  --color-brand-500: #3b6df5;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+  --color-brand-950: #172554;
+
+  /* Success / growth green (#22C55E) */
+  --color-accent-50: #f0fdf4;
+  --color-accent-100: #dcfce7;
+  --color-accent-200: #bbf7d0;
+  --color-accent-300: #86efac;
+  --color-accent-400: #4ade80;
+  --color-accent-500: #22c55e;
+  --color-accent-600: #16a34a;
+  --color-accent-700: #15803d;
+  --color-accent-800: #166534;
+  --color-accent-900: #14532d;
+  --color-accent-950: #052e16;
+
+  /* Accent purple (#7C3AED) — used sparingly for modernity */
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #4c1d95;
+  --color-violet-950: #2e1065;
+
+  /* Dark sections + near-black text */
+  --color-midnight: #0b1220;
+  --color-navy: #0b1220;
+  --color-ink: #0f172a;
+
+  /* Fonts (wired up in layout.tsx via next/font) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, sans-serif;
+
+  /* Extra radius */
+  --radius-4xl: 2rem;
+  --radius-5xl: 2.5rem;
+
+  /* Named animations */
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.8s ease both;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 9s ease-in-out infinite;
+  --animate-marquee: marquee 34s linear infinite;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-aurora: aurora 18s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.08);
+    opacity: 0.9;
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-slate-200);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--color-brand-600);
+    color: white;
+  }
+}
+
+@layer components {
+  /* Centered content container */
+  .container-page {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 80rem;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .container-page {
+      padding-inline: 3rem;
+    }
+  }
+
+  /* Big, confident hero type — ~40px to ~72px fluid */
+  .text-hero {
+    font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+    line-height: 1.03;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+  }
+
+  /* Section heading scale — ~30px to ~44px fluid */
+  .text-display {
+    font-size: clamp(1.875rem, 3.2vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+  }
+
+  /* Brand → violet gradient text */
+  .text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-brand-600),
+      var(--color-violet-600)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Frosted glass (light) — used by floating nav and light panels */
+  .glass {
+    background: color-mix(in srgb, white 72%, transparent);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+
+  /* Glass card on light backgrounds */
+  .glass-card {
+    background: color-mix(in srgb, white 78%, transparent);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid color-mix(in srgb, white 60%, transparent);
+  }
+
+  /* Glass card on dark backgrounds */
+  .glass-dark {
+    background: color-mix(in srgb, white 6%, transparent);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid color-mix(in srgb, white 12%, transparent);
+  }
+
+  /* 1px gradient ring around a rounded element (uses border-radius: inherit) */
+  .gradient-border {
+    position: relative;
+    isolation: isolate;
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--color-brand-500) 70%, transparent),
+      color-mix(in srgb, var(--color-violet-500) 60%, transparent),
+      color-mix(in srgb, var(--color-accent-400) 50%, transparent)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Tiered depth shadows (soft, premium) */
+  .shadow-soft {
+    box-shadow:
+      0 1px 2px rgba(11, 18, 32, 0.04),
+      0 10px 30px -14px rgba(11, 18, 32, 0.16);
+  }
+  .shadow-md {
+    box-shadow:
+      0 2px 6px rgba(11, 18, 32, 0.05),
+      0 18px 48px -18px rgba(11, 18, 32, 0.22);
+  }
+  .shadow-elevated {
+    box-shadow:
+      0 4px 10px rgba(11, 18, 32, 0.06),
+      0 30px 70px -24px rgba(11, 18, 32, 0.3);
+  }
+  .shadow-glow {
+    box-shadow: 0 24px 70px -22px color-mix(in srgb, var(--color-brand-600) 50%, transparent);
+  }
+
+  /* Subtle dotted grid background */
+  .bg-grid {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      color-mix(in srgb, var(--color-slate-300) 55%, transparent) 1px,
+      transparent 0
+    );
+    background-size: 28px 28px;
+  }
+
+  /* Soft aurora gradient mesh for hero/feature backgrounds */
+  .bg-aurora {
+    background-image:
+      radial-gradient(40rem 30rem at 12% -10%, color-mix(in srgb, var(--color-brand-200) 55%, transparent), transparent 60%),
+      radial-gradient(34rem 26rem at 95% 0%, color-mix(in srgb, var(--color-violet-200) 50%, transparent), transparent 60%),
+      radial-gradient(34rem 28rem at 60% 110%, color-mix(in srgb, var(--color-accent-200) 45%, transparent), transparent 60%);
+  }
+}
+
+@layer utilities {
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+  }
+
+  /* Honor reduced-motion preferences globally */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
